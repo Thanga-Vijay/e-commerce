@@ -234,3 +234,76 @@ ports: ## Show exposed ports
 	@echo "Inventory:     http://localhost:8087"
 	@echo "Notification:  http://localhost:8088"
 	@echo "Reporting:     http://localhost:8089"
+
+# Kafka Commands (Phase 9)
+kafka-up: ## Start Kafka infrastructure
+	@echo "$(GREEN)Starting Kafka infrastructure...$(RESET)"
+	docker-compose -f docker-compose.kafka.yml up -d
+	@echo "$(GREEN)Kafka is running!$(RESET)"
+	@echo "Kafka UI: http://localhost:8090"
+
+kafka-down: ## Stop Kafka infrastructure
+	@echo "$(RED)Stopping Kafka infrastructure...$(RESET)"
+	docker-compose -f docker-compose.kafka.yml down
+
+kafka-logs: ## View Kafka logs
+	docker-compose -f docker-compose.kafka.yml logs -f kafka
+
+kafka-topics: ## List all Kafka topics
+	@echo "$(BLUE)Kafka Topics:$(RESET)"
+	docker-compose -f docker-compose.kafka.yml exec kafka kafka-topics --list --bootstrap-server localhost:9092
+
+kafka-topic-describe: ## Describe specific topic (make kafka-topic-describe TOPIC=order.created)
+	docker-compose -f docker-compose.kafka.yml exec kafka kafka-topics --describe --topic $(TOPIC) --bootstrap-server localhost:9092
+
+kafka-consume: ## Consume messages from topic (make kafka-consume TOPIC=order.created)
+	docker-compose -f docker-compose.kafka.yml exec kafka kafka-console-consumer --topic $(TOPIC) --from-beginning --bootstrap-server localhost:9092
+
+kafka-produce: ## Produce message to topic (make kafka-produce TOPIC=order.created)
+	docker-compose -f docker-compose.kafka.yml exec kafka kafka-console-producer --topic $(TOPIC) --bootstrap-server localhost:9092
+
+kafka-consumer-groups: ## List all consumer groups
+	docker-compose -f docker-compose.kafka.yml exec kafka kafka-consumer-groups --list --bootstrap-server localhost:9092
+
+kafka-consumer-lag: ## Check consumer group lag (make kafka-consumer-lag GROUP=your-group)
+	docker-compose -f docker-compose.kafka.yml exec kafka kafka-consumer-groups --describe --group $(GROUP) --bootstrap-server localhost:9092
+
+kafka-reset-offset: ## Reset consumer offset (make kafka-reset-offset GROUP=your-group TOPIC=your-topic)
+	docker-compose -f docker-compose.kafka.yml exec kafka kafka-consumer-groups --reset-offsets --to-earliest --execute --group $(GROUP) --topic $(TOPIC) --bootstrap-server localhost:9092
+
+kafka-ui: ## Open Kafka UI in browser
+	@echo "$(BLUE)Opening Kafka UI...$(RESET)"
+	@echo "Kafka UI: http://localhost:8090"
+
+# Full Stack Commands
+stack-up: ## Start full stack (services + Kafka + monitoring)
+	@echo "$(GREEN)Starting full stack...$(RESET)"
+	docker-compose up -d
+	docker-compose -f docker-compose.kafka.yml up -d
+	docker-compose -f docker-compose.monitoring.yml up -d
+	@echo "$(GREEN)Full stack is running!$(RESET)"
+	@echo "Frontend: http://localhost:3000"
+	@echo "Kafka UI: http://localhost:8090"
+	@echo "Grafana: http://localhost:3001"
+	@echo "Prometheus: http://localhost:9090"
+
+stack-down: ## Stop full stack
+	@echo "$(RED)Stopping full stack...$(RESET)"
+	docker-compose down
+	docker-compose -f docker-compose.kafka.yml down
+	docker-compose -f docker-compose.monitoring.yml down
+
+stack-logs: ## View logs from full stack
+	docker-compose logs -f & docker-compose -f docker-compose.kafka.yml logs -f
+
+monitoring-up: ## Start monitoring stack
+	@echo "$(GREEN)Starting monitoring stack...$(RESET)"
+	docker-compose -f docker-compose.monitoring.yml up -d
+	@echo "$(GREEN)Monitoring is running!$(RESET)"
+	@echo "Prometheus: http://localhost:9090"
+	@echo "Grafana: http://localhost:3001 (admin/admin)"
+	@echo "Alertmanager: http://localhost:9093"
+
+monitoring-down: ## Stop monitoring stack
+	@echo "$(RED)Stopping monitoring stack...$(RESET)"
+	docker-compose -f docker-compose.monitoring.yml down

@@ -4,7 +4,7 @@ A complete enterprise-level e-commerce platform built with microservices archite
 
 ## 🎯 Project Status
 
-**Current Phase**: Phase 8 Complete - Advanced Dockerization & Container Orchestration ✅
+**Current Phase**: Phase 9 Complete - Event-Driven Architecture with Kafka ✅
 
 ### Completed Phases
 - ✅ Phase 1: Architecture Design & Database Schema
@@ -14,7 +14,8 @@ A complete enterprise-level e-commerce platform built with microservices archite
 - ✅ Phase 5: Inventory & Notification Services
 - ✅ Phase 6: Reporting Service with Analytics
 - ✅ Phase 7: React Frontend (Complete UI)
-- ✅ **Phase 8: Advanced Dockerization & Container Orchestration**
+- ✅ Phase 8: Advanced Dockerization & Container Orchestration
+- ✅ **Phase 9: Event-Driven Architecture with Kafka**
 
 ## Technology Stack
 
@@ -24,7 +25,8 @@ A complete enterprise-level e-commerce platform built with microservices archite
 - **ORM**: GORM
 - **Database**: PostgreSQL 15 (9 separate databases)
 - **Cache**: Redis 7 with password authentication
-- **Message Queue**: Apache Kafka (Phase 9)
+- **Message Queue**: Apache Kafka 7.5 with Zookeeper
+- **Event Streaming**: 26 event topics + Dead Letter Queue
 
 ### Frontend
 - **Framework**: React 18 with Vite
@@ -37,6 +39,7 @@ A complete enterprise-level e-commerce platform built with microservices archite
 ### Infrastructure
 - **Containerization**: Docker with multi-stage builds
 - **Orchestration**: Docker Compose (dev/staging/prod)
+- **Event Streaming**: Apache Kafka with Zookeeper
 - **Reverse Proxy**: Nginx with rate limiting
 - **Monitoring**: Prometheus + Grafana + Alertmanager
 - **Logging**: JSON structured logging with rotation
@@ -63,31 +66,33 @@ This platform consists of 9 microservices + frontend:
 ### Development Environment
 
 ```bash
-# Using Make (recommended)
-### Phase Documentation
-- [Phase 1: Architecture](PHASE1_ARCHITECTURE.md) - System design, database schemas, API contracts
-- [Phase 8: Docker & Orchestration](PHASE8_SETUP.md) - Container setup, deployment, monitoring
+# Start all services + Kafka
+make stack-up
 
-### Service Ports
-- Frontend: http://localhost:3000
-- Auth Service: http://localhost:8081
-- Product Service: http://localhost:8082
-- Cart Service: http://localhost:8083
-- Wishlist Service: http://localhost:8084
-- Order Service: http://localhost:8085
-- Payment Service: http://localhost:8086
-- Inventory Service: http://localhost:8087
-- Notification Service: http://localhost:8088
-- Reporting Service: http://localhost:8089
+# Or start services only
+make dev-up-build
 
-### Additional Tools
-- Prometheus: http://localhost:9090 (when monitoring stack running)
-- Grafana: http://localhost:3001 (when monitoring stack running)
-- Alertmanager: http://localhost:9093 (when monitoring stack running
+# Check health
 ./scripts/health-check.sh
 
 # View logs
 make dev-logs
+```
+
+### With Kafka Event Streaming
+
+```bash
+# Start Kafka infrastructure
+make kafka-up
+
+# View Kafka UI
+open http://localhost:8090
+
+# List topics
+make kafka-topics
+
+# Consume events
+make kafka-consume TOPIC=order.created
 ```
 
 ### Production Deployment
@@ -105,7 +110,43 @@ make prod-up-build
 ```
 
 See [PHASE8_SETUP.md](PHASE8_SETUP.md) for detailed Docker and deployment instructions.
+See [PHASE9_KAFKA.md](PHASE9_KAFKA.md) for Kafka event streaming documentation.
+
+## Documentation
+
+### Phase Documentation
+- [Phase 1: Architecture](PHASE1_ARCHITECTURE.md) - System design, database schemas, API contracts
+- [Phase 8: Docker & Orchestration](PHASE8_SETUP.md) - Container setup, deployment, monitoring
+- [Phase 9: Kafka Event Streaming](PHASE9_KAFKA.md) - Event-driven architecture, topics, consumers
+
+### Service Ports
+- Frontend: http://localhost:3000
+- Auth Service: http://localhost:8081
+- Product Service: http://localhost:8082
+- Cart Service: http://localhost:8083
+- Wishlist Service: http://localhost:8084
+- Order Service: http://localhost:8085
+- Payment Service: http://localhost:8086
+- Inventory Service: http://localhost:8087
+- Notification Service: http://localhost:8088
+- Reporting Service: http://localhost:8089
+
+### Infrastructure Ports
+- Kafka: localhost:9093 (external), kafka:9092 (internal)
+- Zookeeper: localhost:2181
+- Kafka UI: http://localhost:8090
+- Prometheus: http://localhost:9090 (when monitoring stack running)
+- Grafana: http://localhost:3001 (when monitoring stack running)
+- Alertmanager: http://localhost:9093 (when monitoring stack running)
+
+## Project Structure
+See [PHASE9_KAFKA.md](PHASE9_KAFKA.md) for Kafka event streaming documentation.
      # React frontend application
+## Project Structure
+
+```
+e-commerce/
+├── frontend/                      # React frontend application
 ├── auth-service/                  # Authentication service
 ├── product-service/               # Product catalog service
 ├── cart-service/                  # Shopping cart service
@@ -115,6 +156,17 @@ See [PHASE8_SETUP.md](PHASE8_SETUP.md) for detailed Docker and deployment instru
 ├── inventory-service/             # Inventory management service
 ├── notification-service/          # Notification service
 ├── reporting-service/             # Analytics and reporting service
+├── events/                        # Event definitions and Kafka utilities
+│   ├── contracts.go              # Event type definitions
+│   ├── kafka/                    # Kafka producer/consumer
+│   │   ├── producer.go           # Event producer
+│   │   ├── consumer.go           # Event consumer
+│   │   └── config.go             # Kafka configuration
+│   └── go.mod                    # Event module dependencies
+├── examples/                      # Integration examples
+│   ├── kafka-integration.go      # Service Kafka integration
+│   ├── kafka-consumers.go        # Consumer examples
+│   └── dlq-handler.go            # Dead letter queue handler
 ├── nginx/                         # Nginx reverse proxy
 ├── monitoring/                    # Monitoring stack configs
 │   ├── prometheus.yml            # Prometheus configuration
@@ -129,18 +181,31 @@ See [PHASE8_SETUP.md](PHASE8_SETUP.md) for detailed Docker and deployment instru
 ├── docker-compose.yml             # Development orchestration
 ├── docker-compose.prod.yml        # Production orchestration
 ├── docker-compose.override.yml    # Development overrides
+├── docker-compose.kafka.yml       # Kafka infrastructure
 ├── docker-compose.monitoring.yml  # Monitoring stack
 ├── docker-compose.secrets.yml     # Secrets configuration
-├── Makefile                       # Docker management commands
+├── Makefile                       # Docker & Kafka management
 ├── .env.prod.example              # Production env template
 ├── .env.staging.example           # Staging env template
 ├── .dockerignore                  # Docker ignore rules
 ├── PHASE1_ARCHITECTURE.md         # Architecture documentation
 ├── PHASE8_SETUP.md                # Docker setup documentation
+├── PHASE9_KAFKA.md                # Kafka event streaming docs
 └── README.md                      # This file
 ```
 
 ## Features
+
+### Phase 9 Highlights
+- ✅ **Apache Kafka Integration**: Complete event streaming infrastructure
+- ✅ **26 Event Topics**: Comprehensive event coverage across all services
+- ✅ **Dead Letter Queue**: Automatic retry with failure handling
+- ✅ **Kafka UI**: Web-based topic and consumer management
+- ✅ **Producer/Consumer Utilities**: Reusable Go libraries
+- ✅ **Event Contracts**: Typed event definitions
+- ✅ **Integration Examples**: Auth, Order, Inventory, Notification
+- ✅ **Async Communication**: Decoupled service communication
+- ✅ **Event Sourcing Ready**: Foundation for event sourcing patterns
 
 ### Phase 8 Highlights
 - ✅ **Multi-Environment Support**: Dev, staging, and production configurations
@@ -150,55 +215,43 @@ See [PHASE8_SETUP.md](PHASE8_SETUP.md) for detailed Docker and deployment instru
 - ✅ **Automated Backup/Restore**: Database backup and restore scripts
 - ✅ **Health Monitoring**: Comprehensive health check system
 - ✅ **Docker Secrets**: Secure secrets management
-- ✅ **Makefile Commands**: 50+ commands for Docker operations
+- ✅ **Makefile Commands**: 70+ commands for Docker & Kafka operations
 - ✅ **Network Isolation**: Separate backend and frontend networks
 - ✅ **Structured Logging**: JSON logs with rotation
 
 ## Next Phases
 
-### Phase 9: Event-Driven Architecture with Kafka
-- Apache Kafka setup
-- Event producers and consumers
-- Event sourcing patterns
-- Dead letter queues
-
 ### Phase 10: Kubernetes Deployment
-- Kubernetes manifests
-- Helm charts
-- Ingress configuration
-- Auto-scaling policies
+- Kubernetes manifests for all services
+- StatefulSets for Kafka and databases
+- Helm charts for easy deployment
+- Ingress configuration with TLS
+- Horizontal Pod Autoscaling (HPA)
+- ConfigMaps and Secrets management
 
 ### Phase 11: Advanced Monitoring & Observability
 - Distributed tracing with Jaeger
 - Log aggregation with ELK Stack
-- APM integration
-- Custom dashboards
+- APM integration (Application Performance Monitoring)
+- Custom Grafana dashboards
+- Kafka metrics and lag monitoring
+- SLI/SLO definition and tracking
 
 ### Phase 12: CI/CD Pipeline
 - GitHub Actions workflows
-- Automated testing
+- Automated testing (unit, integration, e2e)
 - Container registry integration
 - Blue-green deployments
+- Canary releases
+- Automated rollback mechanisms
 
 ### Phase 13: API Gateway & Service Mesh
 - Kong or Traefik API Gateway
-- Istio service mesh
-- Circuit breakers
-- Retry policies payment-service/         # Payment processing service
-├── inventory-service/       # Inventory management service
-├── notification-service/    # Notification service
-├── reporting-service/       # Analytics and reporting service
-├── infrastructure/          # Infrastructure as Code
-│   ├── docker/             # Docker configurations
-│   ├── kind/               # KIND cluster configurations
-│   ├── kubernetes/         # Kubernetes manifests
-│   ├── monitoring/         # Prometheus, Grafana, Loki
-│   ├── kafka/              # Kafka configurations
-│   ├── redis/              # Redis configurations
-│   └── github-actions/     # CI/CD workflows
-├── docs/                    # Documentation
-└── scripts/                 # Utility scripts
-```
+- Istio service mesh integration
+- Circuit breakers and retry policies
+- Rate limiting and throttling
+- mTLS for service-to-service communication
+- Advanced traffic management
 
 ## License
 

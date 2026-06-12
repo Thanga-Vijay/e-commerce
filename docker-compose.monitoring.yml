@@ -1,5 +1,3 @@
-version: '3.8'
-
 # Monitoring Stack - Prometheus + Grafana
 # Add this to your docker-compose setup for monitoring
 

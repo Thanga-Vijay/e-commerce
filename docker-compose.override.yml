@@ -1,5 +1,3 @@
-version: '3.8'
-
 # Docker Compose override for local development
 # This file extends docker-compose.yml with development-specific configurations
 
