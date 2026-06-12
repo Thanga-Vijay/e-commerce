@@ -1,0 +1,124 @@
+# ServiceMonitor resources for Prometheus Operator
+# If using Prometheus Operator, these resources enable automatic service discovery
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: auth-service-monitor
+  namespace: ecommerce
+  labels:
+    app: auth-service
+spec:
+  selector:
+    matchLabels:
+      app: auth-service
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: product-service-monitor
+  namespace: ecommerce
+  labels:
+    app: product-service
+spec:
+  selector:
+    matchLabels:
+      app: product-service
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cart-service-monitor
+  namespace: ecommerce
+  labels:
+    app: cart-service
+spec:
+  selector:
+    matchLabels:
+      app: cart-service
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: order-service-monitor
+  namespace: ecommerce
+  labels:
+    app: order-service
+spec:
+  selector:
+    matchLabels:
+      app: order-service
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: payment-service-monitor
+  namespace: ecommerce
+  labels:
+    app: payment-service
+spec:
+  selector:
+    matchLabels:
+      app: payment-service
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+---
+# PodMonitor for PostgreSQL databases
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: postgresql-monitor
+  namespace: ecommerce
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  podMetricsEndpoints:
+  - port: metrics
+    interval: 30s
+---
+# PodMonitor for Redis
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: redis-monitor
+  namespace: ecommerce
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  podMetricsEndpoints:
+  - port: metrics
+    interval: 30s
+---
+# PodMonitor for Kafka
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: kafka-monitor
+  namespace: ecommerce
+spec:
+  selector:
+    matchLabels:
+      app: kafka
+  podMetricsEndpoints:
+  - port: metrics
+    interval: 30s
