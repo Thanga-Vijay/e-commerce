@@ -469,6 +469,18 @@ services:
       - ecommerce-network
     restart: unless-stopped
 
+  # Frontend React App
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:80"
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
 volumes:
   auth-db-data:
   product-db-data:
