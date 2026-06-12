@@ -1,0 +1,101 @@
+version: '3.8'
+
+# Docker Compose override for local development
+# This file extends docker-compose.yml with development-specific configurations
+
+services:
+  # Frontend with hot reload
+  frontend:
+    volumes:
+      - ./frontend/src:/app/src:delegated
+    environment:
+      - NODE_ENV=development
+
+  # All services with source code mounting for live reload
+  auth-service:
+    volumes:
+      - ./auth-service:/app:delegated
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=debug
+
+  product-service:
+    volumes:
+      - ./product-service:/app:delegated
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=debug
+
+  cart-service:
+    volumes:
+      - ./cart-service:/app:delegated
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=debug
+
+  wishlist-service:
+    volumes:
+      - ./wishlist-service:/app:delegated
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=debug
+
+  order-service:
+    volumes:
+      - ./order-service:/app:delegated
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=debug
+
+  payment-service:
+    volumes:
+      - ./payment-service:/app:delegated
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=debug
+
+  inventory-service:
+    volumes:
+      - ./inventory-service:/app:delegated
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=debug
+
+  notification-service:
+    volumes:
+      - ./notification-service:/app:delegated
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=debug
+
+  reporting-service:
+    volumes:
+      - ./reporting-service:/app:delegated
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=debug
+
+  # Database tools
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin-dev
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@ecommerce.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  # Redis Commander for Redis management
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: redis-commander-dev
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
