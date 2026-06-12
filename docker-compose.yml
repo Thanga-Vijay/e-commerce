@@ -1,0 +1,486 @@
+version: '3.8'
+
+services:
+  # PostgreSQL for Auth Service
+  auth-db:
+    image: postgres:15-alpine
+    container_name: auth-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL for Product Service
+  product-db:
+    image: postgres:15-alpine
+    container_name: product-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: product_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - product-db-data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Auth Service
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - "8081:8081"
+    environment:
+      - PORT=8081
+      - DB_HOST=auth-db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=auth_db
+      - DB_SSLMODE=disable
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=your-256-bit-secret-key-change-this-in-production
+      - JWT_EXPIRY=15m
+      - REFRESH_TOKEN_EXPIRY=168h
+      - ENVIRONMENT=development
+    depends_on:
+      auth-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  # Product Service
+  product-service:
+    build:
+      context: ./product-service
+      dockerfile: Dockerfile
+    container_name: product-service
+    ports:
+      - "8082:8082"
+    environment:
+      - PORT=8082
+      - DB_HOST=product-db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=product_db
+      - DB_SSLMODE=disable
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=your-256-bit-secret-key-change-this-in-production
+      - CACHE_PRODUCT_TTL=3600
+      - CACHE_CATEGORY_TTL=86400
+      - CACHE_SEARCH_TTL=900
+      - ENVIRONMENT=development
+    depends_on:
+      product-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  # PostgreSQL for Cart Service
+  cart-db:
+    image: postgres:15-alpine
+    container_name: cart-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cart_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - cart-db-data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Cart Service
+  cart-service:
+    build:
+      context: ./cart-service
+      dockerfile: Dockerfile
+    container_name: cart-service
+    ports:
+      - "8083:8083"
+    environment:
+      - PORT=8083
+      - DB_HOST=cart-db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=cart_db
+      - DB_SSLMODE=disable
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=your-256-bit-secret-key-change-this-in-production
+      - CACHE_CART_TTL=86400
+      - PRODUCT_SERVICE_URL=http://product-service:8082
+      - ENVIRONMENT=development
+    depends_on:
+      cart-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      product-service:
+        condition: service_started
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  # PostgreSQL for Wishlist Service
+  wishlist-db:
+    image: postgres:15-alpine
+    container_name: wishlist-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: wishlist_db
+    ports:
+      - "5436:5432"
+    volumes:
+      - wishlist-db-data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Wishlist Service
+  wishlist-service:
+    build:
+      context: ./wishlist-service
+      dockerfile: Dockerfile
+    container_name: wishlist-service
+    ports:
+      - "8084:8084"
+    environment:
+      - PORT=8084
+      - DB_HOST=wishlist-db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=wishlist_db
+      - DB_SSLMODE=disable
+      - JWT_SECRET=your-256-bit-secret-key-change-this-in-production
+      - PRODUCT_SERVICE_URL=http://product-service:8082
+      - CART_SERVICE_URL=http://cart-service:8083
+      - ENVIRONMENT=development
+    depends_on:
+      wishlist-db:
+        condition: service_healthy
+      product-service:
+        condition: service_started
+      cart-service:
+        condition: service_started
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  # PostgreSQL for Order Service
+  order-db:
+    image: postgres:15-alpine
+    container_name: order-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: order_db
+    ports:
+      - "5437:5432"
+    volumes:
+      - order-db-data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Order Service
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    container_name: order-service
+    ports:
+      - "8085:8085"
+    environment:
+      - PORT=8085
+      - DB_HOST=order-db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=order_db
+      - DB_SSLMODE=disable
+      - JWT_SECRET=your-256-bit-secret-key-change-this-in-production
+      - CART_SERVICE_URL=http://cart-service:8083
+      - ENVIRONMENT=development
+    depends_on:
+      order-db:
+        condition: service_healthy
+      cart-service:
+        condition: service_started
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  # PostgreSQL for Payment Service
+  payment-db:
+    image: postgres:15-alpine
+    container_name: payment-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: payment_db
+    ports:
+      - "5438:5432"
+    volumes:
+      - payment-db-data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Payment Service
+  payment-service:
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
+    container_name: payment-service
+    ports:
+      - "8086:8086"
+    environment:
+      - PORT=8086
+      - DB_HOST=payment-db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=payment_db
+      - DB_SSLMODE=disable
+      - JWT_SECRET=your-256-bit-secret-key-change-this-in-production
+      - STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key_here
+      - STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here
+      - STRIPE_CURRENCY=usd
+      - ENVIRONMENT=development
+    depends_on:
+      payment-db:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  # PostgreSQL for Inventory Service
+  inventory-db:
+    image: postgres:15-alpine
+    container_name: inventory-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: inventory_db
+    ports:
+      - "5439:5432"
+    volumes:
+      - inventory-db-data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Inventory Service
+  inventory-service:
+    build:
+      context: ./inventory-service
+      dockerfile: Dockerfile
+    container_name: inventory-service
+    ports:
+      - "8087:8087"
+    environment:
+      - PORT=8087
+      - DB_HOST=inventory-db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=inventory_db
+      - DB_SSLMODE=disable
+      - JWT_SECRET=your-256-bit-secret-key-change-this-in-production
+      - ENVIRONMENT=development
+    depends_on:
+      inventory-db:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  # PostgreSQL for Notification Service
+  notification-db:
+    image: postgres:15-alpine
+    container_name: notification-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: notification_db
+    ports:
+      - "5440:5432"
+    volumes:
+      - notification-db-data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Notification Service
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    ports:
+      - "8088:8088"
+    environment:
+      - PORT=8088
+      - DB_HOST=notification-db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=notification_db
+      - DB_SSLMODE=disable
+      - JWT_SECRET=your-256-bit-secret-key-change-this-in-production
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USERNAME=your-email@gmail.com
+      - SMTP_PASSWORD=your-app-password
+      - SMTP_FROM=noreply@ecommerce.com
+      - SMTP_FROM_NAME=E-Commerce Platform
+      - ENVIRONMENT=development
+    depends_on:
+      notification-db:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  # PostgreSQL for Reporting Service
+  reporting-db:
+    image: postgres:15-alpine
+    container_name: reporting-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: reporting_db
+    ports:
+      - "5441:5432"
+    volumes:
+      - reporting-db-data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Reporting Service
+  reporting-service:
+    build:
+      context: ./reporting-service
+      dockerfile: Dockerfile
+    container_name: reporting-service
+    ports:
+      - "8089:8089"
+    environment:
+      - PORT=8089
+      - DB_HOST=reporting-db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=reporting_db
+      - DB_SSLMODE=disable
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=your-256-bit-secret-key-change-this-in-production
+      - AUTH_SERVICE_URL=http://auth-service:8081
+      - PRODUCT_SERVICE_URL=http://product-service:8082
+      - ORDER_SERVICE_URL=http://order-service:8085
+      - PAYMENT_SERVICE_URL=http://payment-service:8086
+      - ENVIRONMENT=development
+    depends_on:
+      reporting-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+volumes:
+  auth-db-data:
+  product-db-data:
+  cart-db-data:
+  wishlist-db-data:
+  order-db-data:
+  payment-db-data:
+  inventory-db-data:
+  notification-db-data:
+  reporting-db-data:
+  redis-data:
+
+networks:
+  ecommerce-network:
+    driver: bridge
