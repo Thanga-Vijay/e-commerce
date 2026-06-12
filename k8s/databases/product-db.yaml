@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: product-db
+  namespace: ecommerce
+spec:
+  serviceName: product-db-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-db
+  template:
+    metadata:
+      labels:
+        app: product-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          value: "product_db"
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - name: product-db-storage
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+  volumeClaimTemplates:
+  - metadata:
+      name: product-db-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-db-service
+  namespace: ecommerce
+spec:
+  selector:
+    app: product-db
+  ports:
+  - port: 5432
+    targetPort: 5432
+  clusterIP: None

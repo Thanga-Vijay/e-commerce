@@ -1,0 +1,479 @@
+# This file creates all remaining database StatefulSets
+# Cart, Wishlist, Order, Payment, Inventory, Notification, Reporting
+
+---
+# Cart Database
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cart-db
+  namespace: ecommerce
+spec:
+  serviceName: cart-db-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cart-db
+  template:
+    metadata:
+      labels:
+        app: cart-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          value: "cart_db"
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - name: cart-db-storage
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+  volumeClaimTemplates:
+  - metadata:
+      name: cart-db-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cart-db-service
+  namespace: ecommerce
+spec:
+  selector:
+    app: cart-db
+  ports:
+  - port: 5432
+  clusterIP: None
+---
+# Wishlist Database
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: wishlist-db
+  namespace: ecommerce
+spec:
+  serviceName: wishlist-db-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wishlist-db
+  template:
+    metadata:
+      labels:
+        app: wishlist-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          value: "wishlist_db"
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - name: wishlist-db-storage
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+  volumeClaimTemplates:
+  - metadata:
+      name: wishlist-db-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wishlist-db-service
+  namespace: ecommerce
+spec:
+  selector:
+    app: wishlist-db
+  ports:
+  - port: 5432
+  clusterIP: None
+---
+# Order Database
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: order-db
+  namespace: ecommerce
+spec:
+  serviceName: order-db-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-db
+  template:
+    metadata:
+      labels:
+        app: order-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          value: "order_db"
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - name: order-db-storage
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+  volumeClaimTemplates:
+  - metadata:
+      name: order-db-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-db-service
+  namespace: ecommerce
+spec:
+  selector:
+    app: order-db
+  ports:
+  - port: 5432
+  clusterIP: None
+---
+# Payment Database
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: payment-db
+  namespace: ecommerce
+spec:
+  serviceName: payment-db-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-db
+  template:
+    metadata:
+      labels:
+        app: payment-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          value: "payment_db"
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - name: payment-db-storage
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+  volumeClaimTemplates:
+  - metadata:
+      name: payment-db-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-db-service
+  namespace: ecommerce
+spec:
+  selector:
+    app: payment-db
+  ports:
+  - port: 5432
+  clusterIP: None
+---
+# Inventory Database
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: inventory-db
+  namespace: ecommerce
+spec:
+  serviceName: inventory-db-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inventory-db
+  template:
+    metadata:
+      labels:
+        app: inventory-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          value: "inventory_db"
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - name: inventory-db-storage
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+  volumeClaimTemplates:
+  - metadata:
+      name: inventory-db-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-db-service
+  namespace: ecommerce
+spec:
+  selector:
+    app: inventory-db
+  ports:
+  - port: 5432
+  clusterIP: None
+---
+# Notification Database
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: notification-db
+  namespace: ecommerce
+spec:
+  serviceName: notification-db-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-db
+  template:
+    metadata:
+      labels:
+        app: notification-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          value: "notification_db"
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - name: notification-db-storage
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+  volumeClaimTemplates:
+  - metadata:
+      name: notification-db-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-db-service
+  namespace: ecommerce
+spec:
+  selector:
+    app: notification-db
+  ports:
+  - port: 5432
+  clusterIP: None
+---
+# Reporting Database
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: reporting-db
+  namespace: ecommerce
+spec:
+  serviceName: reporting-db-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reporting-db
+  template:
+    metadata:
+      labels:
+        app: reporting-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          value: "reporting_db"
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - name: reporting-db-storage
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+  volumeClaimTemplates:
+  - metadata:
+      name: reporting-db-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reporting-db-service
+  namespace: ecommerce
+spec:
+  selector:
+    app: reporting-db
+  ports:
+  - port: 5432
+  clusterIP: None

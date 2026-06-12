@@ -1,0 +1,143 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ecommerce-ingress
+  namespace: ecommerce
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - ecommerce.yourdomain.com
+    - api.ecommerce.yourdomain.com
+    secretName: ecommerce-tls
+  rules:
+  # Frontend
+  - host: ecommerce.yourdomain.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80
+  
+  # API Gateway / Backend Services
+  - host: api.ecommerce.yourdomain.com
+    http:
+      paths:
+      # Auth Service
+      - path: /api/v1/auth
+        pathType: Prefix
+        backend:
+          service:
+            name: auth-service
+            port:
+              number: 8081
+      
+      # Product Service
+      - path: /api/v1/products
+        pathType: Prefix
+        backend:
+          service:
+            name: product-service
+            port:
+              number: 8082
+      
+      - path: /api/v1/categories
+        pathType: Prefix
+        backend:
+          service:
+            name: product-service
+            port:
+              number: 8082
+      
+      # Cart Service
+      - path: /api/v1/cart
+        pathType: Prefix
+        backend:
+          service:
+            name: cart-service
+            port:
+              number: 8083
+      
+      # Wishlist Service
+      - path: /api/v1/wishlist
+        pathType: Prefix
+        backend:
+          service:
+            name: wishlist-service
+            port:
+              number: 8084
+      
+      # Order Service
+      - path: /api/v1/orders
+        pathType: Prefix
+        backend:
+          service:
+            name: order-service
+            port:
+              number: 8085
+      
+      # Payment Service
+      - path: /api/v1/payments
+        pathType: Prefix
+        backend:
+          service:
+            name: payment-service
+            port:
+              number: 8086
+      
+      - path: /webhooks
+        pathType: Prefix
+        backend:
+          service:
+            name: payment-service
+            port:
+              number: 8086
+      
+      # Inventory Service
+      - path: /api/v1/inventory
+        pathType: Prefix
+        backend:
+          service:
+            name: inventory-service
+            port:
+              number: 8087
+      
+      # Notification Service
+      - path: /api/v1/notifications
+        pathType: Prefix
+        backend:
+          service:
+            name: notification-service
+            port:
+              number: 8088
+      
+      # Reporting Service
+      - path: /api/v1/dashboard
+        pathType: Prefix
+        backend:
+          service:
+            name: reporting-service
+            port:
+              number: 8089
+      
+      - path: /api/v1/reports
+        pathType: Prefix
+        backend:
+          service:
+            name: reporting-service
+            port:
+              number: 8089
