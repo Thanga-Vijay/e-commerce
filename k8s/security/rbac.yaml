@@ -1,0 +1,158 @@
+# RBAC Configuration for E-Commerce Platform
+
+---
+# Service Account for application pods
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ecommerce-app
+  namespace: ecommerce
+
+---
+# Role for application pods (minimal permissions)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ecommerce-app-role
+  namespace: ecommerce
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get"]
+
+---
+# RoleBinding for application pods
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ecommerce-app-binding
+  namespace: ecommerce
+subjects:
+- kind: ServiceAccount
+  name: ecommerce-app
+  namespace: ecommerce
+roleRef:
+  kind: Role
+  name: ecommerce-app-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Service Account for CI/CD deployments
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cicd-deployer
+  namespace: ecommerce
+
+---
+# Role for CI/CD (broader permissions for deployments)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cicd-deployer-role
+  namespace: ecommerce
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments", "statefulsets", "daemonsets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: [""]
+  resources: ["services", "configmaps", "secrets", "pods", "pods/log"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["autoscaling"]
+  resources: ["horizontalpodautoscalers"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+---
+# RoleBinding for CI/CD
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cicd-deployer-binding
+  namespace: ecommerce
+subjects:
+- kind: ServiceAccount
+  name: cicd-deployer
+  namespace: ecommerce
+roleRef:
+  kind: Role
+  name: cicd-deployer-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Service Account for backup jobs
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: backup-job
+  namespace: ecommerce
+
+---
+# Role for backup operations
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: backup-job-role
+  namespace: ecommerce
+rules:
+- apiGroups: [""]
+  resources: ["pods", "pods/exec"]
+  verbs: ["get", "list", "create"]
+- apiGroups: [""]
+  resources: ["persistentvolumeclaims"]
+  verbs: ["get", "list"]
+
+---
+# RoleBinding for backup jobs
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: backup-job-binding
+  namespace: ecommerce
+subjects:
+- kind: ServiceAccount
+  name: backup-job
+  namespace: ecommerce
+roleRef:
+  kind: Role
+  name: backup-job-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# ClusterRole for monitoring (read-only cluster-wide)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ecommerce-monitoring
+rules:
+- apiGroups: [""]
+  resources: ["nodes", "nodes/metrics", "services", "endpoints", "pods"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "statefulsets", "daemonsets"]
+  verbs: ["get", "list", "watch"]
+- nonResourceURLs: ["/metrics"]
+  verbs: ["get"]
+
+---
+# ClusterRoleBinding for monitoring
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ecommerce-monitoring-binding
+subjects:
+- kind: ServiceAccount
+  name: prometheus
+  namespace: ecommerce
+roleRef:
+  kind: ClusterRole
+  name: ecommerce-monitoring
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,176 @@
+# Pod Security Standards and Policies
+
+---
+# PodSecurityPolicy (deprecated in K8s 1.25+, use Pod Security Standards instead)
+# This is for reference - use PodSecurityStandards label on namespace instead
+
+# Label the namespace with Pod Security Standard
+# kubectl label namespace ecommerce pod-security.kubernetes.io/enforce=restricted
+# kubectl label namespace ecommerce pod-security.kubernetes.io/audit=restricted
+# kubectl label namespace ecommerce pod-security.kubernetes.io/warn=restricted
+
+---
+# SecurityContext configuration for deployments
+# Add this to all deployment specs
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: security-context-template
+  namespace: ecommerce
+data:
+  security-context.yaml: |
+    # Add to pod spec:
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      fsGroup: 2000
+      seccompProfile:
+        type: RuntimeDefault
+    
+    # Add to container spec:
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 1000
+
+---
+# PodDisruptionBudget for Auth Service
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: auth-service-pdb
+  namespace: ecommerce
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: auth-service
+
+---
+# PodDisruptionBudget for Product Service
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: product-service-pdb
+  namespace: ecommerce
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: product-service
+
+---
+# PodDisruptionBudget for Order Service
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: order-service-pdb
+  namespace: ecommerce
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: order-service
+
+---
+# PodDisruptionBudget for Payment Service (critical)
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: payment-service-pdb
+  namespace: ecommerce
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: payment-service
+
+---
+# PodDisruptionBudget for Frontend
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: frontend-pdb
+  namespace: ecommerce
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: frontend
+
+---
+# PodDisruptionBudget for Databases
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: database-pdb
+  namespace: ecommerce
+spec:
+  maxUnavailable: 0
+  selector:
+    matchLabels:
+      tier: database
+
+---
+# PodDisruptionBudget for Kafka
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: kafka-pdb
+  namespace: ecommerce
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: kafka
+
+---
+# ResourceQuota for namespace
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: ecommerce-quota
+  namespace: ecommerce
+spec:
+  hard:
+    requests.cpu: "50"
+    requests.memory: 100Gi
+    limits.cpu: "100"
+    limits.memory: 200Gi
+    persistentvolumeclaims: "50"
+    services.loadbalancers: "5"
+
+---
+# LimitRange for pods
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: ecommerce-limits
+  namespace: ecommerce
+spec:
+  limits:
+  - max:
+      cpu: "4"
+      memory: "8Gi"
+    min:
+      cpu: "50m"
+      memory: "64Mi"
+    default:
+      cpu: "500m"
+      memory: "512Mi"
+    defaultRequest:
+      cpu: "100m"
+      memory: "128Mi"
+    type: Container
+  - max:
+      cpu: "8"
+      memory: "16Gi"
+    min:
+      cpu: "100m"
+      memory: "128Mi"
+    type: Pod
