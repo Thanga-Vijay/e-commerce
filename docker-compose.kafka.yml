@@ -14,6 +14,7 @@ services:
       - "2181:2181"
     networks:
       - kafka-network
+      - e-commerce_ecommerce-network
     volumes:
       - zookeeper-data:/var/lib/zookeeper/data
       - zookeeper-logs:/var/lib/zookeeper/log
@@ -50,7 +51,7 @@ services:
       KAFKA_NUM_PARTITIONS: 3
     networks:
       - kafka-network
-      - backend-network
+      - e-commerce_ecommerce-network
     volumes:
       - kafka-data:/var/lib/kafka/data
     restart: unless-stopped
@@ -76,6 +77,7 @@ services:
       DYNAMIC_CONFIG_ENABLED: "true"
     networks:
       - kafka-network
+      - e-commerce_ecommerce-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/actuator/health"]
@@ -92,6 +94,7 @@ services:
       - kafka
     networks:
       - kafka-network
+      - e-commerce_ecommerce-network
     entrypoint: ["/bin/sh", "-c"]
     command: |
       "
@@ -148,8 +151,9 @@ services:
 networks:
   kafka-network:
     driver: bridge
-  backend-network:
+  e-commerce_ecommerce-network:
     external: true
+    #name: e-commerce_ecommerce-network
 
 volumes:
   zookeeper-data:

@@ -5,7 +5,6 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/ecommerce/auth-service/internal/models"

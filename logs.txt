@@ -1,0 +1,902 @@
+cart-service       | 
+cart-service       | 2026/06/13 07:18:06 [32m/app/cmd/main.go:45
+cart-service       | [0m[33m[29.478ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'carts' AND table_type = 'BASE TABLE'
+cart-service       | 
+cart-service       | 2026/06/13 07:18:06 [32m/app/cmd/main.go:45
+cart-service       | [0m[33m[15.762ms] [34;1m[rows:0][0m CREATE TABLE "carts" ("id" uuid DEFAULT gen_random_uuid(),"user_id" uuid NOT NULL,"expires_at" timestamptz NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+cart-service       | 
+cart-service       | 2026/06/13 07:18:06 [32m/app/cmd/main.go:45
+cart-service       | [0m[33m[19.425ms] [34;1m[rows:0][0m CREATE INDEX IF NOT EXISTS "idx_carts_deleted_at" ON "carts" ("deleted_at")
+cart-service       | 
+cart-service       | 2026/06/13 07:18:06 [32m/app/cmd/main.go:45
+cart-service       | [0m[33m[9.632ms] [34;1m[rows:0][0m CREATE UNIQUE INDEX IF NOT EXISTS "idx_carts_user_id" ON "carts" ("user_id")
+cart-service       | 
+cart-service       | 2026/06/13 07:18:06 [32m/app/cmd/main.go:45
+cart-service       | [0m[33m[16.715ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'cart_items' AND table_type = 'BASE TABLE'
+cart-service       | 
+cart-service       | 2026/06/13 07:18:06 [32m/app/cmd/main.go:45
+cart-service       | [0m[33m[60.007ms] [34;1m[rows:0][0m CREATE TABLE "cart_items" ("id" uuid DEFAULT gen_random_uuid(),"cart_id" uuid NOT NULL,"product_id" uuid NOT NULL,"product_name" text NOT NULL,"product_price" decimal NOT NULL,"product_image" text,"quantity" bigint NOT NULL,"subtotal" decimal NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"),CONSTRAINT "fk_carts_items" FOREIGN KEY ("cart_id") REFERENCES "carts"("id"))
+cart-service       | 2026/06/13 07:18:06 Cart Service starting on port 8083
+cart-service       | 
+cart-service       | 2026/06/13 07:18:06 [32m/app/cmd/main.go:45
+cart-service       | [0m[33m[7.481ms] [34;1m[rows:0][0m CREATE INDEX IF NOT EXISTS "idx_cart_items_deleted_at" ON "cart_items" ("deleted_at")
+cart-service       | [GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+cart-service       | 
+cart-service       | [GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+cart-service       |  - using env:	export GIN_MODE=release
+cart-service       |  - using code:	gin.SetMode(gin.ReleaseMode)
+cart-service       | 
+cart-service       | [GIN-debug] GET    /health                   --> github.com/ecommerce/cart-service/internal/handlers.(*HealthHandler).HealthCheck-fm (4 handlers)
+cart-service       | [GIN-debug] GET    /ready                    --> github.com/ecommerce/cart-service/internal/handlers.(*HealthHandler).ReadinessCheck-fm (4 handlers)
+cart-service       | [GIN-debug] GET    /api/v1/cart              --> github.com/ecommerce/cart-service/internal/handlers.(*CartHandler).GetCart-fm (5 handlers)
+cart-service       | [GIN-debug] POST   /api/v1/cart/items        --> github.com/ecommerce/cart-service/internal/handlers.(*CartHandler).AddToCart-fm (5 handlers)
+cart-service       | [GIN-debug] PUT    /api/v1/cart/items/:id    --> github.com/ecommerce/cart-service/internal/handlers.(*CartHandler).UpdateCartItem-fm (5 handlers)
+cart-service       | [GIN-debug] DELETE /api/v1/cart/items/:id    --> github.com/ecommerce/cart-service/internal/handlers.(*CartHandler).RemoveFromCart-fm (5 handlers)
+cart-service       | [GIN-debug] DELETE /api/v1/cart              --> github.com/ecommerce/cart-service/internal/handlers.(*CartHandler).ClearCart-fm (5 handlers)
+inventory-db       |  done
+inventory-db       | server stopped
+inventory-db       | 
+inventory-db       | PostgreSQL init process complete; ready for start up.
+inventory-db       | 
+inventory-db       | 2026-06-13 07:17:59.743 UTC [1] LOG:  starting PostgreSQL 15.18 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+inventory-db       | 2026-06-13 07:17:59.743 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+inventory-db       | 2026-06-13 07:17:59.743 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+inventory-db       | 2026-06-13 07:17:59.773 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+inventory-db       | 2026-06-13 07:17:59.804 UTC [56] LOG:  database system was shut down at 2026-06-13 07:17:59 UTC
+inventory-db       | 2026-06-13 07:17:59.834 UTC [1] LOG:  database system is ready to accept connections
+inventory-db       | 2026-06-13 07:18:05.113 UTC [67] ERROR:  function uuid_generate_v4() does not exist at character 46
+frontend           | /docker-entrypoint.sh: /docker-entrypoint.d/ is not empty, will attempt to perform configuration
+frontend           | /docker-entrypoint.sh: Looking for shell scripts in /docker-entrypoint.d/
+frontend           | /docker-entrypoint.sh: Launching /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh
+frontend           | 10-listen-on-ipv6-by-default.sh: info: Getting the checksum of /etc/nginx/conf.d/default.conf
+frontend           | 10-listen-on-ipv6-by-default.sh: info: /etc/nginx/conf.d/default.conf differs from the packaged version
+frontend           | /docker-entrypoint.sh: Sourcing /docker-entrypoint.d/15-local-resolvers.envsh
+frontend           | /docker-entrypoint.sh: Launching /docker-entrypoint.d/20-envsubst-on-templates.sh
+frontend           | /docker-entrypoint.sh: Launching /docker-entrypoint.d/30-tune-worker-processes.sh
+frontend           | /docker-entrypoint.sh: Configuration complete; ready for start up
+frontend           | 2026/06/13 07:17:54 [notice] 1#1: using the "epoll" event method
+frontend           | 2026/06/13 07:17:54 [notice] 1#1: nginx/1.31.1
+frontend           | 2026/06/13 07:17:54 [notice] 1#1: built by gcc 15.2.0 (Alpine 15.2.0) 
+frontend           | 2026/06/13 07:17:54 [notice] 1#1: OS: Linux 6.12.69-linuxkit
+frontend           | 2026/06/13 07:17:54 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1048576:1048576
+frontend           | 2026/06/13 07:17:54 [notice] 1#1: start worker processes
+frontend           | 2026/06/13 07:17:54 [notice] 1#1: start worker process 29
+frontend           | 2026/06/13 07:17:54 [notice] 1#1: start worker process 30
+frontend           | 2026/06/13 07:17:54 [notice] 1#1: start worker process 31
+frontend           | 2026/06/13 07:17:54 [notice] 1#1: start worker process 32
+frontend           | 2026/06/13 07:17:54 [notice] 1#1: start worker process 33
+frontend           | 2026/06/13 07:17:54 [notice] 1#1: start worker process 34
+frontend           | 2026/06/13 07:17:54 [notice] 1#1: start worker process 35
+frontend           | 2026/06/13 07:17:54 [notice] 1#1: start worker process 36
+inventory-db       | 2026-06-13 07:18:05.113 UTC [67] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+inventory-db       | 2026-06-13 07:18:05.113 UTC [67] STATEMENT:  CREATE TABLE "warehouses" ("id" uuid DEFAULT uuid_generate_v4(),"name" varchar(255) NOT NULL,"code" varchar(50) NOT NULL UNIQUE,"address" jsonb NOT NULL,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+inventory-db       | 2026-06-13 07:18:07.529 UTC [68] ERROR:  function uuid_generate_v4() does not exist at character 46
+inventory-db       | 2026-06-13 07:18:07.529 UTC [68] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+inventory-db       | 2026-06-13 07:18:07.529 UTC [68] STATEMENT:  CREATE TABLE "warehouses" ("id" uuid DEFAULT uuid_generate_v4(),"name" varchar(255) NOT NULL,"code" varchar(50) NOT NULL UNIQUE,"address" jsonb NOT NULL,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+inventory-db       | 2026-06-13 07:18:10.493 UTC [69] ERROR:  function uuid_generate_v4() does not exist at character 46
+inventory-db       | 2026-06-13 07:18:10.493 UTC [69] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+inventory-db       | 2026-06-13 07:18:10.493 UTC [69] STATEMENT:  CREATE TABLE "warehouses" ("id" uuid DEFAULT uuid_generate_v4(),"name" varchar(255) NOT NULL,"code" varchar(50) NOT NULL UNIQUE,"address" jsonb NOT NULL,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+inventory-db       | 2026-06-13 07:18:13.536 UTC [76] ERROR:  function uuid_generate_v4() does not exist at character 46
+inventory-db       | 2026-06-13 07:18:13.536 UTC [76] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+inventory-db       | 2026-06-13 07:18:13.536 UTC [76] STATEMENT:  CREATE TABLE "warehouses" ("id" uuid DEFAULT uuid_generate_v4(),"name" varchar(255) NOT NULL,"code" varchar(50) NOT NULL UNIQUE,"address" jsonb NOT NULL,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+inventory-db       | 2026-06-13 07:18:16.360 UTC [78] ERROR:  function uuid_generate_v4() does not exist at character 46
+inventory-db       | 2026-06-13 07:18:16.360 UTC [78] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+inventory-db       | 2026-06-13 07:18:16.360 UTC [78] STATEMENT:  CREATE TABLE "warehouses" ("id" uuid DEFAULT uuid_generate_v4(),"name" varchar(255) NOT NULL,"code" varchar(50) NOT NULL UNIQUE,"address" jsonb NOT NULL,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+inventory-db       | 2026-06-13 07:18:19.115 UTC [79] ERROR:  function uuid_generate_v4() does not exist at character 46
+inventory-db       | 2026-06-13 07:18:19.115 UTC [79] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+inventory-db       | 2026-06-13 07:18:19.115 UTC [79] STATEMENT:  CREATE TABLE "warehouses" ("id" uuid DEFAULT uuid_generate_v4(),"name" varchar(255) NOT NULL,"code" varchar(50) NOT NULL UNIQUE,"address" jsonb NOT NULL,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+inventory-db       | 2026-06-13 07:18:23.792 UTC [80] ERROR:  function uuid_generate_v4() does not exist at character 46
+inventory-db       | 2026-06-13 07:18:23.792 UTC [80] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+inventory-db       | 2026-06-13 07:18:23.792 UTC [80] STATEMENT:  CREATE TABLE "warehouses" ("id" uuid DEFAULT uuid_generate_v4(),"name" varchar(255) NOT NULL,"code" varchar(50) NOT NULL UNIQUE,"address" jsonb NOT NULL,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+inventory-db       | 2026-06-13 07:18:33.944 UTC [89] ERROR:  function uuid_generate_v4() does not exist at character 46
+inventory-db       | 2026-06-13 07:18:33.944 UTC [89] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+inventory-db       | 2026-06-13 07:18:33.944 UTC [89] STATEMENT:  CREATE TABLE "warehouses" ("id" uuid DEFAULT uuid_generate_v4(),"name" varchar(255) NOT NULL,"code" varchar(50) NOT NULL UNIQUE,"address" jsonb NOT NULL,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+inventory-db       | 2026-06-13 07:18:49.607 UTC [103] ERROR:  function uuid_generate_v4() does not exist at character 46
+inventory-db       | 2026-06-13 07:18:49.607 UTC [103] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+inventory-db       | 2026-06-13 07:18:49.607 UTC [103] STATEMENT:  CREATE TABLE "warehouses" ("id" uuid DEFAULT uuid_generate_v4(),"name" varchar(255) NOT NULL,"code" varchar(50) NOT NULL UNIQUE,"address" jsonb NOT NULL,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+inventory-db       | 2026-06-13 07:19:16.054 UTC [121] ERROR:  function uuid_generate_v4() does not exist at character 46
+inventory-db       | 2026-06-13 07:19:16.054 UTC [121] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+inventory-db       | 2026-06-13 07:19:16.054 UTC [121] STATEMENT:  CREATE TABLE "warehouses" ("id" uuid DEFAULT uuid_generate_v4(),"name" varchar(255) NOT NULL,"code" varchar(50) NOT NULL UNIQUE,"address" jsonb NOT NULL,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+inventory-db       | 2026-06-13 07:20:07.775 UTC [166] ERROR:  function uuid_generate_v4() does not exist at character 46
+inventory-db       | 2026-06-13 07:20:07.775 UTC [166] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+inventory-db       | 2026-06-13 07:20:07.775 UTC [166] STATEMENT:  CREATE TABLE "warehouses" ("id" uuid DEFAULT uuid_generate_v4(),"name" varchar(255) NOT NULL,"code" varchar(50) NOT NULL UNIQUE,"address" jsonb NOT NULL,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+inventory-db       | 2026-06-13 07:21:08.103 UTC [205] ERROR:  function uuid_generate_v4() does not exist at character 46
+inventory-db       | 2026-06-13 07:21:08.103 UTC [205] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+inventory-db       | 2026-06-13 07:21:08.103 UTC [205] STATEMENT:  CREATE TABLE "warehouses" ("id" uuid DEFAULT uuid_generate_v4(),"name" varchar(255) NOT NULL,"code" varchar(50) NOT NULL UNIQUE,"address" jsonb NOT NULL,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+inventory-db       | 2026-06-13 07:22:08.426 UTC [251] ERROR:  function uuid_generate_v4() does not exist at character 46
+inventory-db       | 2026-06-13 07:22:08.426 UTC [251] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+inventory-db       | 2026-06-13 07:22:08.426 UTC [251] STATEMENT:  CREATE TABLE "warehouses" ("id" uuid DEFAULT uuid_generate_v4(),"name" varchar(255) NOT NULL,"code" varchar(50) NOT NULL UNIQUE,"address" jsonb NOT NULL,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+frontend           | 142.250.206.59 - - [13/Jun/2026:07:19:05 +0000] "GET / HTTP/1.1" 200 466 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36" "-"
+frontend           | 142.250.206.59 - - [13/Jun/2026:07:19:05 +0000] "GET /vite.svg HTTP/1.1" 404 555 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36" "-"
+frontend           | 2026/06/13 07:19:05 [error] 30#30: *1 open() "/usr/share/nginx/html/vite.svg" failed (2: No such file or directory), client: 142.250.206.59, server: localhost, request: "GET /vite.svg HTTP/1.1", host: "localhost:3000", referrer: "http://localhost:3000/"
+reporting-db       |  done
+reporting-db       | server stopped
+reporting-db       | 
+reporting-db       | PostgreSQL init process complete; ready for start up.
+reporting-db       | 
+reporting-db       | 2026-06-13 07:18:00.251 UTC [1] LOG:  starting PostgreSQL 15.18 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+reporting-db       | 2026-06-13 07:18:00.251 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+reporting-db       | 2026-06-13 07:18:00.251 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+reporting-db       | 2026-06-13 07:18:00.270 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+reporting-db       | 2026-06-13 07:18:00.314 UTC [56] LOG:  database system was shut down at 2026-06-13 07:18:00 UTC
+reporting-db       | 2026-06-13 07:18:00.338 UTC [1] LOG:  database system is ready to accept connections
+reporting-db       | 2026-06-13 07:18:05.715 UTC [67] ERROR:  function uuid_generate_v4() does not exist at character 43
+reporting-db       | 2026-06-13 07:18:05.715 UTC [67] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+reporting-db       | 2026-06-13 07:18:05.715 UTC [67] STATEMENT:  CREATE TABLE "reports" ("id" uuid DEFAULT uuid_generate_v4(),"name" text NOT NULL,"type" text NOT NULL,"period" text,"start_date" timestamptz,"end_date" timestamptz,"data" jsonb,"generated_by" uuid,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+reporting-db       | 2026-06-13 07:18:08.404 UTC [68] ERROR:  function uuid_generate_v4() does not exist at character 43
+reporting-db       | 2026-06-13 07:18:08.404 UTC [68] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+reporting-db       | 2026-06-13 07:18:08.404 UTC [68] STATEMENT:  CREATE TABLE "reports" ("id" uuid DEFAULT uuid_generate_v4(),"name" text NOT NULL,"type" text NOT NULL,"period" text,"start_date" timestamptz,"end_date" timestamptz,"data" jsonb,"generated_by" uuid,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+reporting-db       | 2026-06-13 07:18:11.195 UTC [69] ERROR:  function uuid_generate_v4() does not exist at character 43
+reporting-db       | 2026-06-13 07:18:11.195 UTC [69] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+reporting-db       | 2026-06-13 07:18:11.195 UTC [69] STATEMENT:  CREATE TABLE "reports" ("id" uuid DEFAULT uuid_generate_v4(),"name" text NOT NULL,"type" text NOT NULL,"period" text,"start_date" timestamptz,"end_date" timestamptz,"data" jsonb,"generated_by" uuid,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+reporting-db       | 2026-06-13 07:18:14.935 UTC [77] ERROR:  function uuid_generate_v4() does not exist at character 43
+reporting-db       | 2026-06-13 07:18:14.935 UTC [77] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+reporting-db       | 2026-06-13 07:18:14.935 UTC [77] STATEMENT:  CREATE TABLE "reports" ("id" uuid DEFAULT uuid_generate_v4(),"name" text NOT NULL,"type" text NOT NULL,"period" text,"start_date" timestamptz,"end_date" timestamptz,"data" jsonb,"generated_by" uuid,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+reporting-db       | 2026-06-13 07:18:17.715 UTC [78] ERROR:  function uuid_generate_v4() does not exist at character 43
+reporting-db       | 2026-06-13 07:18:17.715 UTC [78] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+reporting-db       | 2026-06-13 07:18:17.715 UTC [78] STATEMENT:  CREATE TABLE "reports" ("id" uuid DEFAULT uuid_generate_v4(),"name" text NOT NULL,"type" text NOT NULL,"period" text,"start_date" timestamptz,"end_date" timestamptz,"data" jsonb,"generated_by" uuid,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+reporting-db       | 2026-06-13 07:18:20.281 UTC [79] ERROR:  function uuid_generate_v4() does not exist at character 43
+reporting-db       | 2026-06-13 07:18:20.281 UTC [79] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+reporting-db       | 2026-06-13 07:18:20.281 UTC [79] STATEMENT:  CREATE TABLE "reports" ("id" uuid DEFAULT uuid_generate_v4(),"name" text NOT NULL,"type" text NOT NULL,"period" text,"start_date" timestamptz,"end_date" timestamptz,"data" jsonb,"generated_by" uuid,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+reporting-service  | 2026/06/13 07:18:25 [31;1m/app/cmd/main.go:34 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+reporting-db       | 2026-06-13 07:18:25.906 UTC [87] ERROR:  function uuid_generate_v4() does not exist at character 43
+reporting-service  | [0m[33m[51.286ms] [34;1m[rows:0][0m CREATE TABLE "reports" ("id" uuid DEFAULT uuid_generate_v4(),"name" text NOT NULL,"type" text NOT NULL,"period" text,"start_date" timestamptz,"end_date" timestamptz,"data" jsonb,"generated_by" uuid,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+reporting-service  | 2026/06/13 07:18:40 No .env file found, using environment variables
+reporting-service  | 
+reporting-service  | 2026/06/13 07:18:41 [32m/app/cmd/main.go:34
+reporting-service  | [0m[33m[150.100ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'reports' AND table_type = 'BASE TABLE'
+reporting-service  | 2026/06/13 07:18:41 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+reporting-service  | 
+reporting-service  | 2026/06/13 07:18:41 [31;1m/app/cmd/main.go:34 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+reporting-service  | [0m[33m[8.673ms] [34;1m[rows:0][0m CREATE TABLE "reports" ("id" uuid DEFAULT uuid_generate_v4(),"name" text NOT NULL,"type" text NOT NULL,"period" text,"start_date" timestamptz,"end_date" timestamptz,"data" jsonb,"generated_by" uuid,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+reporting-service  | 2026/06/13 07:18:55 No .env file found, using environment variables
+reporting-service  | 
+reporting-service  | 2026/06/13 07:18:55 [32m/app/cmd/main.go:34
+reporting-service  | [0m[33m[55.992ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'reports' AND table_type = 'BASE TABLE'
+reporting-service  | 2026/06/13 07:18:55 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+reporting-service  | 
+reporting-service  | 2026/06/13 07:18:55 [31;1m/app/cmd/main.go:34 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+reporting-service  | [0m[33m[13.730ms] [34;1m[rows:0][0m CREATE TABLE "reports" ("id" uuid DEFAULT uuid_generate_v4(),"name" text NOT NULL,"type" text NOT NULL,"period" text,"start_date" timestamptz,"end_date" timestamptz,"data" jsonb,"generated_by" uuid,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+reporting-service  | 2026/06/13 07:19:22 No .env file found, using environment variables
+reporting-service  | 
+reporting-service  | 2026/06/13 07:19:22 [32m/app/cmd/main.go:34
+reporting-service  | [0m[33m[27.778ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'reports' AND table_type = 'BASE TABLE'
+reporting-service  | 2026/06/13 07:19:22 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+reporting-service  | 
+reporting-service  | 2026/06/13 07:19:22 [31;1m/app/cmd/main.go:34 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+reporting-service  | [0m[33m[3.395ms] [34;1m[rows:0][0m CREATE TABLE "reports" ("id" uuid DEFAULT uuid_generate_v4(),"name" text NOT NULL,"type" text NOT NULL,"period" text,"start_date" timestamptz,"end_date" timestamptz,"data" jsonb,"generated_by" uuid,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+reporting-service  | 2026/06/13 07:20:13 No .env file found, using environment variables
+reporting-service  | 
+reporting-service  | 2026/06/13 07:20:13 [32m/app/cmd/main.go:34
+reporting-service  | [0m[33m[18.766ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'reports' AND table_type = 'BASE TABLE'
+reporting-service  | 
+reporting-service  | 2026/06/13 07:20:13 [31;1m/app/cmd/main.go:34 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+reporting-service  | [0m[33m[3.154ms] [34;1m[rows:0][0m CREATE TABLE "reports" ("id" uuid DEFAULT uuid_generate_v4(),"name" text NOT NULL,"type" text NOT NULL,"period" text,"start_date" timestamptz,"end_date" timestamptz,"data" jsonb,"generated_by" uuid,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+reporting-service  | 2026/06/13 07:20:13 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+reporting-service  | 2026/06/13 07:21:13 No .env file found, using environment variables
+reporting-service  | 
+reporting-service  | 2026/06/13 07:21:13 [32m/app/cmd/main.go:34
+reporting-service  | [0m[33m[17.855ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'reports' AND table_type = 'BASE TABLE'
+reporting-service  | 
+reporting-service  | 2026/06/13 07:21:13 [31;1m/app/cmd/main.go:34 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+reporting-service  | [0m[33m[2.606ms] [34;1m[rows:0][0m CREATE TABLE "reports" ("id" uuid DEFAULT uuid_generate_v4(),"name" text NOT NULL,"type" text NOT NULL,"period" text,"start_date" timestamptz,"end_date" timestamptz,"data" jsonb,"generated_by" uuid,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+reporting-service  | 2026/06/13 07:21:13 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+reporting-service  | 2026/06/13 07:22:14 No .env file found, using environment variables
+reporting-service  | 
+reporting-service  | 2026/06/13 07:22:14 [32m/app/cmd/main.go:34
+reporting-service  | [0m[33m[13.454ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'reports' AND table_type = 'BASE TABLE'
+reporting-service  | 2026/06/13 07:22:14 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+reporting-service  | 
+reporting-service  | 2026/06/13 07:22:14 [31;1m/app/cmd/main.go:34 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+reporting-service  | [0m[33m[2.118ms] [34;1m[rows:0][0m CREATE TABLE "reports" ("id" uuid DEFAULT uuid_generate_v4(),"name" text NOT NULL,"type" text NOT NULL,"period" text,"start_date" timestamptz,"end_date" timestamptz,"data" jsonb,"generated_by" uuid,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+reporting-db       | 2026-06-13 07:18:25.906 UTC [87] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+reporting-db       | 2026-06-13 07:18:25.906 UTC [87] STATEMENT:  CREATE TABLE "reports" ("id" uuid DEFAULT uuid_generate_v4(),"name" text NOT NULL,"type" text NOT NULL,"period" text,"start_date" timestamptz,"end_date" timestamptz,"data" jsonb,"generated_by" uuid,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+reporting-db       | 2026-06-13 07:18:41.308 UTC [95] ERROR:  function uuid_generate_v4() does not exist at character 43
+reporting-db       | 2026-06-13 07:18:41.308 UTC [95] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+reporting-db       | 2026-06-13 07:18:41.308 UTC [95] STATEMENT:  CREATE TABLE "reports" ("id" uuid DEFAULT uuid_generate_v4(),"name" text NOT NULL,"type" text NOT NULL,"period" text,"start_date" timestamptz,"end_date" timestamptz,"data" jsonb,"generated_by" uuid,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+reporting-db       | 2026-06-13 07:18:55.862 UTC [105] ERROR:  function uuid_generate_v4() does not exist at character 43
+reporting-db       | 2026-06-13 07:18:55.862 UTC [105] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+reporting-db       | 2026-06-13 07:18:55.862 UTC [105] STATEMENT:  CREATE TABLE "reports" ("id" uuid DEFAULT uuid_generate_v4(),"name" text NOT NULL,"type" text NOT NULL,"period" text,"start_date" timestamptz,"end_date" timestamptz,"data" jsonb,"generated_by" uuid,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+reporting-db       | 2026-06-13 07:19:22.066 UTC [128] ERROR:  function uuid_generate_v4() does not exist at character 43
+reporting-db       | 2026-06-13 07:19:22.066 UTC [128] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+reporting-db       | 2026-06-13 07:19:22.066 UTC [128] STATEMENT:  CREATE TABLE "reports" ("id" uuid DEFAULT uuid_generate_v4(),"name" text NOT NULL,"type" text NOT NULL,"period" text,"start_date" timestamptz,"end_date" timestamptz,"data" jsonb,"generated_by" uuid,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+reporting-db       | 2026-06-13 07:20:13.606 UTC [166] ERROR:  function uuid_generate_v4() does not exist at character 43
+reporting-db       | 2026-06-13 07:20:13.606 UTC [166] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+reporting-db       | 2026-06-13 07:20:13.606 UTC [166] STATEMENT:  CREATE TABLE "reports" ("id" uuid DEFAULT uuid_generate_v4(),"name" text NOT NULL,"type" text NOT NULL,"period" text,"start_date" timestamptz,"end_date" timestamptz,"data" jsonb,"generated_by" uuid,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+reporting-db       | 2026-06-13 07:21:13.882 UTC [211] ERROR:  function uuid_generate_v4() does not exist at character 43
+reporting-db       | 2026-06-13 07:21:13.882 UTC [211] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+reporting-db       | 2026-06-13 07:21:13.882 UTC [211] STATEMENT:  CREATE TABLE "reports" ("id" uuid DEFAULT uuid_generate_v4(),"name" text NOT NULL,"type" text NOT NULL,"period" text,"start_date" timestamptz,"end_date" timestamptz,"data" jsonb,"generated_by" uuid,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+reporting-db       | 2026-06-13 07:22:14.173 UTC [255] ERROR:  function uuid_generate_v4() does not exist at character 43
+reporting-db       | 2026-06-13 07:22:14.173 UTC [255] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+reporting-db       | 2026-06-13 07:22:14.173 UTC [255] STATEMENT:  CREATE TABLE "reports" ("id" uuid DEFAULT uuid_generate_v4(),"name" text NOT NULL,"type" text NOT NULL,"period" text,"start_date" timestamptz,"end_date" timestamptz,"data" jsonb,"generated_by" uuid,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+wishlist-db        | 
+wishlist-db        | fixing permissions on existing directory /var/lib/postgresql/data ... ok
+wishlist-db        | creating subdirectories ... ok
+wishlist-db        | selecting dynamic shared memory implementation ... posix
+wishlist-db        | selecting default max_connections ... 100
+wishlist-db        | selecting default shared_buffers ... 128MB
+wishlist-db        | selecting default time zone ... UTC
+wishlist-db        | creating configuration files ... ok
+wishlist-db        | running bootstrap script ... ok
+order-service      | 2026/06/13 07:18:26 [31;1m/app/cmd/main.go:31 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+order-service      | [0m[33m[22.804ms] [34;1m[rows:0][0m CREATE TABLE "orders" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid NOT NULL,"order_number" varchar(50) NOT NULL UNIQUE,"status" varchar(20) NOT NULL,"subtotal" decimal(10,2) NOT NULL,"tax" decimal(10,2) NOT NULL,"shipping_cost" decimal(10,2) NOT NULL,"total" decimal(10,2) NOT NULL,"shipping_address" jsonb NOT NULL,"billing_address" jsonb NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+order-service      | 2026/06/13 07:18:42 No .env file found, using environment variables
+order-service      | 
+order-service      | 2026/06/13 07:18:42 [32m/app/cmd/main.go:31
+wishlist-db        | sh: locale: not found
+order-service      | [0m[33m[91.196ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'orders' AND table_type = 'BASE TABLE'
+order-service      | 2026/06/13 07:18:42 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+order-service      | 
+order-service      | 2026/06/13 07:18:42 [31;1m/app/cmd/main.go:31 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+order-service      | [0m[33m[6.182ms] [34;1m[rows:0][0m CREATE TABLE "orders" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid NOT NULL,"order_number" varchar(50) NOT NULL UNIQUE,"status" varchar(20) NOT NULL,"subtotal" decimal(10,2) NOT NULL,"tax" decimal(10,2) NOT NULL,"shipping_cost" decimal(10,2) NOT NULL,"total" decimal(10,2) NOT NULL,"shipping_address" jsonb NOT NULL,"billing_address" jsonb NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+order-service      | 2026/06/13 07:18:56 No .env file found, using environment variables
+order-service      | 
+order-service      | 2026/06/13 07:18:56 [32m/app/cmd/main.go:31
+order-service      | [0m[33m[23.545ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'orders' AND table_type = 'BASE TABLE'
+order-service      | 2026/06/13 07:18:56 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+order-service      | 
+redis              | 1:C 13 Jun 2026 07:17:52.461 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+redis              | 1:C 13 Jun 2026 07:17:52.461 * Redis version=7.4.9, bits=64, commit=00000000, modified=0, pid=1, just started
+wishlist-db        | 2026-06-13 07:17:56.782 UTC [34] WARNING:  no usable system locales were found
+wishlist-db        | performing post-bootstrap initialization ... ok
+wishlist-db        | initdb: warning: enabling "trust" authentication for local connections
+wishlist-db        | initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
+product-service    | 
+product-service    | 2026/06/13 07:18:04 [32m/app/cmd/main.go:44
+product-service    | [0m[33m[9.508ms] [34;1m[rows:0][0m CREATE INDEX IF NOT EXISTS "idx_categories_deleted_at" ON "categories" ("deleted_at")
+product-service    | 
+product-service    | 2026/06/13 07:18:04 [32m/app/cmd/main.go:44
+product-service    | [0m[33m[6.420ms] [34;1m[rows:0][0m CREATE UNIQUE INDEX IF NOT EXISTS "idx_categories_name" ON "categories" ("name")
+product-service    | 
+product-service    | 2026/06/13 07:18:04 [32m/app/cmd/main.go:44
+auth-db            | 2026-06-13 07:19:32.300 UTC [142] FATAL:  password authentication failed for user "postgres"
+auth-db            | 2026-06-13 07:19:32.300 UTC [142] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db            | 2026-06-13 07:19:47.294 UTC [156] FATAL:  password authentication failed for user "postgres"
+auth-db            | 2026-06-13 07:19:47.294 UTC [156] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db            | 2026-06-13 07:19:47.295 UTC [157] FATAL:  password authentication failed for user "postgres"
+auth-db            | 2026-06-13 07:19:47.295 UTC [157] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+redis              | 1:C 13 Jun 2026 07:17:52.461 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+redis              | 1:M 13 Jun 2026 07:17:52.462 * monotonic clock: POSIX clock_gettime
+redis              | 1:M 13 Jun 2026 07:17:52.464 * Running mode=standalone, port=6379.
+redis              | 1:M 13 Jun 2026 07:17:52.465 * Server initialized
+redis              | 1:M 13 Jun 2026 07:17:52.465 * Ready to accept connections tcp
+wishlist-db        | syncing data to disk ... ok
+wishlist-db        | 
+wishlist-db        | 
+wishlist-db        | Success. You can now start the database server using:
+wishlist-db        | 
+wishlist-db        |     pg_ctl -D /var/lib/postgresql/data -l logfile start
+wishlist-db        | 
+wishlist-db        | waiting for server to start....2026-06-13 07:18:00.123 UTC [40] LOG:  starting PostgreSQL 15.18 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+wishlist-db        | 2026-06-13 07:18:00.129 UTC [40] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+wishlist-db        | 2026-06-13 07:18:00.151 UTC [43] LOG:  database system was shut down at 2026-06-13 07:17:58 UTC
+wishlist-db        | 2026-06-13 07:18:00.169 UTC [40] LOG:  database system is ready to accept connections
+wishlist-db        |  done
+wishlist-db        | server started
+wishlist-db        | CREATE DATABASE
+wishlist-db        | 
+wishlist-db        | 
+wishlist-db        | /usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+wishlist-db        | 
+wishlist-db        | waiting for server to shut down....2026-06-13 07:18:00.511 UTC [40] LOG:  received fast shutdown request
+wishlist-db        | 2026-06-13 07:18:00.514 UTC [40] LOG:  aborting any active transactions
+wishlist-db        | 2026-06-13 07:18:00.517 UTC [40] LOG:  background worker "logical replication launcher" (PID 46) exited with exit code 1
+wishlist-db        | 2026-06-13 07:18:00.527 UTC [41] LOG:  shutting down
+wishlist-db        | 2026-06-13 07:18:00.540 UTC [41] LOG:  checkpoint starting: shutdown immediate
+wishlist-db        | 2026-06-13 07:18:00.844 UTC [41] LOG:  checkpoint complete: wrote 921 buffers (5.6%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.094 s, sync=0.201 s, total=0.318 s; sync files=301, longest=0.007 s, average=0.001 s; distance=4239 kB, estimate=4239 kB
+wishlist-db        | 2026-06-13 07:18:00.859 UTC [40] LOG:  database system is shut down
+wishlist-db        |  done
+wishlist-db        | server stopped
+wishlist-db        | 
+wishlist-db        | PostgreSQL init process complete; ready for start up.
+wishlist-db        | 
+wishlist-db        | 2026-06-13 07:18:00.969 UTC [1] LOG:  starting PostgreSQL 15.18 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+wishlist-db        | 2026-06-13 07:18:00.969 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+wishlist-db        | 2026-06-13 07:18:00.969 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+wishlist-db        | 2026-06-13 07:18:00.986 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+wishlist-db        | 2026-06-13 07:18:01.006 UTC [56] LOG:  database system was shut down at 2026-06-13 07:18:00 UTC
+wishlist-db        | 2026-06-13 07:18:01.028 UTC [1] LOG:  database system is ready to accept connections
+order-service      | 2026/06/13 07:18:56 [31;1m/app/cmd/main.go:31 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+order-service      | [0m[33m[15.334ms] [34;1m[rows:0][0m CREATE TABLE "orders" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid NOT NULL,"order_number" varchar(50) NOT NULL UNIQUE,"status" varchar(20) NOT NULL,"subtotal" decimal(10,2) NOT NULL,"tax" decimal(10,2) NOT NULL,"shipping_cost" decimal(10,2) NOT NULL,"total" decimal(10,2) NOT NULL,"shipping_address" jsonb NOT NULL,"billing_address" jsonb NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+order-service      | 2026/06/13 07:19:22 No .env file found, using environment variables
+order-service      | 
+order-service      | 2026/06/13 07:19:22 [32m/app/cmd/main.go:31
+order-service      | [0m[33m[29.150ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'orders' AND table_type = 'BASE TABLE'
+order-service      | 
+order-service      | 2026/06/13 07:19:22 [31;1m/app/cmd/main.go:31 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+order-service      | [0m[33m[5.521ms] [34;1m[rows:0][0m CREATE TABLE "orders" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid NOT NULL,"order_number" varchar(50) NOT NULL UNIQUE,"status" varchar(20) NOT NULL,"subtotal" decimal(10,2) NOT NULL,"tax" decimal(10,2) NOT NULL,"shipping_cost" decimal(10,2) NOT NULL,"total" decimal(10,2) NOT NULL,"shipping_address" jsonb NOT NULL,"billing_address" jsonb NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+order-service      | 2026/06/13 07:19:22 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+order-service      | 2026/06/13 07:20:14 No .env file found, using environment variables
+order-service      | 
+order-service      | 2026/06/13 07:20:14 [32m/app/cmd/main.go:31
+order-service      | [0m[33m[13.565ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'orders' AND table_type = 'BASE TABLE'
+order-service      | 2026/06/13 07:20:14 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+order-service      | 
+order-service      | 2026/06/13 07:20:14 [31;1m/app/cmd/main.go:31 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+order-service      | [0m[33m[2.780ms] [34;1m[rows:0][0m CREATE TABLE "orders" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid NOT NULL,"order_number" varchar(50) NOT NULL UNIQUE,"status" varchar(20) NOT NULL,"subtotal" decimal(10,2) NOT NULL,"tax" decimal(10,2) NOT NULL,"shipping_cost" decimal(10,2) NOT NULL,"total" decimal(10,2) NOT NULL,"shipping_address" jsonb NOT NULL,"billing_address" jsonb NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+order-service      | 2026/06/13 07:21:14 No .env file found, using environment variables
+order-service      | 
+product-service    | [0m[33m[2.471ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'products' AND table_type = 'BASE TABLE'
+auth-service       | 
+order-service      | 2026/06/13 07:21:14 [32m/app/cmd/main.go:31
+order-service      | [0m[33m[15.160ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'orders' AND table_type = 'BASE TABLE'
+order-service      | 2026/06/13 07:21:14 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+order-service      | 
+order-service      | 2026/06/13 07:21:14 [31;1m/app/cmd/main.go:31 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+order-service      | [0m[33m[4.621ms] [34;1m[rows:0][0m CREATE TABLE "orders" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid NOT NULL,"order_number" varchar(50) NOT NULL UNIQUE,"status" varchar(20) NOT NULL,"subtotal" decimal(10,2) NOT NULL,"tax" decimal(10,2) NOT NULL,"shipping_cost" decimal(10,2) NOT NULL,"total" decimal(10,2) NOT NULL,"shipping_address" jsonb NOT NULL,"billing_address" jsonb NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+order-service      | 2026/06/13 07:22:14 No .env file found, using environment variables
+order-service      | 
+order-service      | 2026/06/13 07:22:14 [32m/app/cmd/main.go:31
+order-service      | [0m[33m[14.414ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'orders' AND table_type = 'BASE TABLE'
+order-service      | 
+order-service      | 2026/06/13 07:22:14 [31;1m/app/cmd/main.go:31 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+order-service      | [0m[33m[3.553ms] [34;1m[rows:0][0m CREATE TABLE "orders" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid NOT NULL,"order_number" varchar(50) NOT NULL UNIQUE,"status" varchar(20) NOT NULL,"subtotal" decimal(10,2) NOT NULL,"tax" decimal(10,2) NOT NULL,"shipping_cost" decimal(10,2) NOT NULL,"total" decimal(10,2) NOT NULL,"shipping_address" jsonb NOT NULL,"billing_address" jsonb NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+order-service      | 2026/06/13 07:22:14 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+wishlist-service   | 
+wishlist-service   | 2026/06/13 07:18:08 [32m/app/cmd/main.go:40
+wishlist-service   | [0m[33m[28.498ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'wishlists' AND table_type = 'BASE TABLE'
+wishlist-service   | 
+auth-db            | 2026-06-13 07:20:02.287 UTC [166] FATAL:  password authentication failed for user "postgres"
+auth-db            | 2026-06-13 07:20:02.287 UTC [166] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db            | 2026-06-13 07:20:02.287 UTC [167] FATAL:  password authentication failed for user "postgres"
+auth-db            | 2026-06-13 07:20:02.287 UTC [167] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db            | 2026-06-13 07:20:17.286 UTC [177] FATAL:  password authentication failed for user "postgres"
+auth-db            | 2026-06-13 07:20:17.286 UTC [177] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db            | 2026-06-13 07:20:17.287 UTC [178] FATAL:  password authentication failed for user "postgres"
+auth-db            | 2026-06-13 07:20:17.287 UTC [178] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db            | 2026-06-13 07:20:32.293 UTC [193] FATAL:  password authentication failed for user "postgres"
+auth-db            | 2026-06-13 07:20:32.293 UTC [193] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db            | 2026-06-13 07:20:32.294 UTC [194] FATAL:  password authentication failed for user "postgres"
+wishlist-service   | 2026/06/13 07:18:08 [32m/app/cmd/main.go:40
+auth-service       | 2026/06/13 07:18:04 [32m/app/cmd/main.go:44
+auth-service       | [0m[33m[83.810ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND table_type = 'BASE TABLE'
+auth-service       | 
+auth-service       | 2026/06/13 07:18:05 [32m/app/cmd/main.go:44
+auth-service       | [0m[33m[69.068ms] [34;1m[rows:0][0m CREATE TABLE "users" ("id" uuid DEFAULT gen_random_uuid(),"email" text NOT NULL,"password_hash" text NOT NULL,"first_name" text,"last_name" text,"role" varchar(20) DEFAULT 'customer',"is_verified" boolean DEFAULT false,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+auth-service       | 
+auth-service       | 2026/06/13 07:18:05 [32m/app/cmd/main.go:44
+auth-service       | [0m[33m[10.561ms] [34;1m[rows:0][0m CREATE INDEX IF NOT EXISTS "idx_users_deleted_at" ON "users" ("deleted_at")
+auth-service       | 
+auth-service       | 2026/06/13 07:18:05 [32m/app/cmd/main.go:44
+auth-service       | [0m[33m[8.645ms] [34;1m[rows:0][0m CREATE UNIQUE INDEX IF NOT EXISTS "idx_users_email" ON "users" ("email")
+auth-service       | 
+auth-service       | 2026/06/13 07:18:05 [32m/app/cmd/main.go:44
+auth-service       | [0m[33m[3.141ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'refresh_tokens' AND table_type = 'BASE TABLE'
+auth-service       | 
+auth-service       | 2026/06/13 07:18:05 [32m/app/cmd/main.go:44
+auth-service       | [0m[33m[15.376ms] [34;1m[rows:0][0m CREATE TABLE "refresh_tokens" ("id" uuid DEFAULT gen_random_uuid(),"user_id" uuid NOT NULL,"token" text NOT NULL,"expires_at" timestamptz NOT NULL,"created_at" timestamptz,PRIMARY KEY ("id"))
+order-db           |  done
+order-db           | server stopped
+order-db           | 
+order-db              | PostgreSQL init process complete; ready for start up.
+auth-service       | 
+auth-service          | 2026/06/13 07:18:05 [32m/app/cmd/main.go:44
+auth-service          | [0m[33m[6.328ms] [34;1m[rows:0][0m CREATE UNIQUE INDEX IF NOT EXISTS "idx_refresh_tokens_token" ON "refresh_tokens" ("token")
+auth-service          | 
+auth-service          | 2026/06/13 07:18:05 [32m/app/cmd/main.go:44
+auth-service          | [0m[33m[1.952ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'password_resets' AND table_type = 'BASE TABLE'
+auth-service          | 
+auth-service          | 2026/06/13 07:18:05 [32m/app/cmd/main.go:44
+auth-service          | [0m[33m[48.986ms] [34;1m[rows:0][0m CREATE TABLE "password_resets" ("id" uuid DEFAULT gen_random_uuid(),"user_id" uuid NOT NULL,"token" text NOT NULL,"expires_at" timestamptz NOT NULL,"used" boolean DEFAULT false,"created_at" timestamptz,PRIMARY KEY ("id"))
+auth-service          | 
+auth-service          | 2026/06/13 07:18:05 [32m/app/cmd/main.go:44
+order-db              | 
+order-db              | 2026-06-13 07:18:01.459 UTC [1] LOG:  starting PostgreSQL 15.18 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+order-db              | 2026-06-13 07:18:01.459 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+order-db              | 2026-06-13 07:18:01.459 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+order-db              | 2026-06-13 07:18:01.471 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+order-db              | 2026-06-13 07:18:01.480 UTC [58] LOG:  database system was shut down at 2026-06-13 07:18:01 UTC
+order-db              | 2026-06-13 07:18:01.505 UTC [1] LOG:  database system is ready to accept connections
+order-db              | 2026-06-13 07:18:08.048 UTC [69] ERROR:  function uuid_generate_v4() does not exist at character 42
+wishlist-service   | [0m[33m[17.192ms] [34;1m[rows:0][0m CREATE TABLE "wishlists" ("id" uuid DEFAULT gen_random_uuid(),"user_id" uuid NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+wishlist-service      | 
+wishlist-service      | 2026/06/13 07:18:08 [32m/app/cmd/main.go:40
+wishlist-service      | [0m[33m[23.202ms] [34;1m[rows:0][0m CREATE INDEX IF NOT EXISTS "idx_wishlists_deleted_at" ON "wishlists" ("deleted_at")
+wishlist-service      | 
+wishlist-service      | 2026/06/13 07:18:08 [32m/app/cmd/main.go:40
+wishlist-service      | [0m[33m[8.703ms] [34;1m[rows:0][0m CREATE UNIQUE INDEX IF NOT EXISTS "idx_wishlists_user_id" ON "wishlists" ("user_id")
+wishlist-service      | 
+wishlist-service      | 2026/06/13 07:18:08 [32m/app/cmd/main.go:40
+wishlist-service      | [0m[33m[3.445ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'wishlist_items' AND table_type = 'BASE TABLE'
+wishlist-service      | 
+wishlist-service      | 2026/06/13 07:18:08 [32m/app/cmd/main.go:40
+wishlist-service      | [0m[33m[30.214ms] [34;1m[rows:0][0m CREATE TABLE "wishlist_items" ("id" uuid DEFAULT gen_random_uuid(),"wishlist_id" uuid NOT NULL,"product_id" uuid NOT NULL,"product_name" text NOT NULL,"product_price" decimal NOT NULL,"product_image" text,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"),CONSTRAINT "fk_wishlists_items" FOREIGN KEY ("wishlist_id") REFERENCES "wishlists"("id"))
+wishlist-service      | 
+wishlist-service      | 2026/06/13 07:18:08 [32m/app/cmd/main.go:40
+wishlist-service      | [0m[33m[9.494ms] [34;1m[rows:0][0m CREATE INDEX IF NOT EXISTS "idx_wishlist_items_deleted_at" ON "wishlist_items" ("deleted_at")
+wishlist-service      | [GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+wishlist-service      | 
+wishlist-service      | [GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+wishlist-service      |  - using env:	export GIN_MODE=release
+wishlist-service      |  - using code:	gin.SetMode(gin.ReleaseMode)
+wishlist-service      | 
+wishlist-service      | [GIN-debug] GET    /health                   --> github.com/ecommerce/wishlist-service/internal/handlers.(*HealthHandler).HealthCheck-fm (4 handlers)
+wishlist-service      | [GIN-debug] GET    /ready                    --> github.com/ecommerce/wishlist-service/internal/handlers.(*HealthHandler).ReadinessCheck-fm (4 handlers)
+wishlist-service      | [GIN-debug] GET    /api/v1/wishlist          --> github.com/ecommerce/wishlist-service/internal/handlers.(*WishlistHandler).GetWishlist-fm (5 handlers)
+wishlist-service      | [GIN-debug] POST   /api/v1/wishlist/items    --> github.com/ecommerce/wishlist-service/internal/handlers.(*WishlistHandler).AddToWishlist-fm (5 handlers)
+wishlist-service      | [GIN-debug] DELETE /api/v1/wishlist/items/:id --> github.com/ecommerce/wishlist-service/internal/handlers.(*WishlistHandler).RemoveFromWishlist-fm (5 handlers)
+wishlist-service      | [GIN-debug] DELETE /api/v1/wishlist          --> github.com/ecommerce/wishlist-service/internal/handlers.(*WishlistHandler).ClearWishlist-fm (5 handlers)
+inventory-service     | [0m[33m[6.313ms] [34;1m[rows:0][0m CREATE TABLE "warehouses" ("id" uuid DEFAULT uuid_generate_v4(),"name" varchar(255) NOT NULL,"code" varchar(50) NOT NULL UNIQUE,"address" jsonb NOT NULL,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+product-db            | 
+product-db            | fixing permissions on existing directory /var/lib/postgresql/data ... ok
+inventory-service     | 2026/06/13 07:18:23 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+inventory-service     | 2026/06/13 07:18:33 No .env file found, using environment variables
+payment-db            |  done
+product-service    | 
+product-service       | 2026/06/13 07:18:04 [32m/app/cmd/main.go:44
+auth-service          | [0m[33m[13.147ms] [34;1m[rows:0][0m CREATE UNIQUE INDEX IF NOT EXISTS "idx_password_resets_token" ON "password_resets" ("token")
+auth-service          | 2026/06/13 07:18:05 Auth Service starting on port 8081
+auth-service          | [GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+auth-service          | 
+auth-service          | [GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+auth-service          |  - using env:	export GIN_MODE=release
+auth-service          |  - using code:	gin.SetMode(gin.ReleaseMode)
+auth-service          | 
+auth-service          | [GIN-debug] GET    /health                   --> github.com/ecommerce/auth-service/internal/handlers.(*HealthHandler).HealthCheck-fm (4 handlers)
+auth-service          | [GIN-debug] GET    /ready                    --> github.com/ecommerce/auth-service/internal/handlers.(*HealthHandler).ReadinessCheck-fm (4 handlers)
+auth-service          | [GIN-debug] POST   /api/v1/auth/register     --> github.com/ecommerce/auth-service/internal/handlers.(*AuthHandler).Register-fm (4 handlers)
+auth-service          | [GIN-debug] POST   /api/v1/auth/login        --> github.com/ecommerce/auth-service/internal/handlers.(*AuthHandler).Login-fm (4 handlers)
+auth-service          | [GIN-debug] POST   /api/v1/auth/refresh      --> github.com/ecommerce/auth-service/internal/handlers.(*AuthHandler).RefreshToken-fm (4 handlers)
+order-db              | 2026-06-13 07:18:08.048 UTC [69] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+order-db              | 2026-06-13 07:18:08.048 UTC [69] STATEMENT:  CREATE TABLE "orders" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid NOT NULL,"order_number" varchar(50) NOT NULL UNIQUE,"status" varchar(20) NOT NULL,"subtotal" decimal(10,2) NOT NULL,"tax" decimal(10,2) NOT NULL,"shipping_cost" decimal(10,2) NOT NULL,"total" decimal(10,2) NOT NULL,"shipping_address" jsonb NOT NULL,"billing_address" jsonb NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+order-db              | 2026-06-13 07:18:10.951 UTC [70] ERROR:  function uuid_generate_v4() does not exist at character 42
+order-db              | 2026-06-13 07:18:10.951 UTC [70] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+auth-db            | 2026-06-13 07:20:32.294 UTC [194] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+order-db              | 2026-06-13 07:18:10.951 UTC [70] STATEMENT:  CREATE TABLE "orders" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid NOT NULL,"order_number" varchar(50) NOT NULL UNIQUE,"status" varchar(20) NOT NULL,"subtotal" decimal(10,2) NOT NULL,"tax" decimal(10,2) NOT NULL,"shipping_cost" decimal(10,2) NOT NULL,"total" decimal(10,2) NOT NULL,"shipping_address" jsonb NOT NULL,"billing_address" jsonb NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+order-db              | 2026-06-13 07:18:14.318 UTC [71] ERROR:  function uuid_generate_v4() does not exist at character 42
+order-db              | 2026-06-13 07:18:14.318 UTC [71] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+order-db              | 2026-06-13 07:18:14.318 UTC [71] STATEMENT:  CREATE TABLE "orders" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid NOT NULL,"order_number" varchar(50) NOT NULL UNIQUE,"status" varchar(20) NOT NULL,"subtotal" decimal(10,2) NOT NULL,"tax" decimal(10,2) NOT NULL,"shipping_cost" decimal(10,2) NOT NULL,"total" decimal(10,2) NOT NULL,"shipping_address" jsonb NOT NULL,"billing_address" jsonb NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+order-db              | 2026-06-13 07:18:17.148 UTC [80] ERROR:  function uuid_generate_v4() does not exist at character 42
+order-db              | 2026-06-13 07:18:17.148 UTC [80] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+order-db              | 2026-06-13 07:18:17.148 UTC [80] STATEMENT:  CREATE TABLE "orders" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid NOT NULL,"order_number" varchar(50) NOT NULL UNIQUE,"status" varchar(20) NOT NULL,"subtotal" decimal(10,2) NOT NULL,"tax" decimal(10,2) NOT NULL,"shipping_cost" decimal(10,2) NOT NULL,"total" decimal(10,2) NOT NULL,"shipping_address" jsonb NOT NULL,"billing_address" jsonb NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+order-db              | 2026-06-13 07:18:18.972 UTC [81] ERROR:  function uuid_generate_v4() does not exist at character 42
+order-db              | 2026-06-13 07:18:18.972 UTC [81] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+order-db              | 2026-06-13 07:18:18.972 UTC [81] STATEMENT:  CREATE TABLE "orders" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid NOT NULL,"order_number" varchar(50) NOT NULL UNIQUE,"status" varchar(20) NOT NULL,"subtotal" decimal(10,2) NOT NULL,"tax" decimal(10,2) NOT NULL,"shipping_cost" decimal(10,2) NOT NULL,"total" decimal(10,2) NOT NULL,"shipping_address" jsonb NOT NULL,"billing_address" jsonb NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+order-db              | 2026-06-13 07:18:21.765 UTC [82] ERROR:  function uuid_generate_v4() does not exist at character 42
+order-db              | 2026-06-13 07:18:21.765 UTC [82] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+order-db              | 2026-06-13 07:18:21.765 UTC [82] STATEMENT:  CREATE TABLE "orders" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid NOT NULL,"order_number" varchar(50) NOT NULL UNIQUE,"status" varchar(20) NOT NULL,"subtotal" decimal(10,2) NOT NULL,"tax" decimal(10,2) NOT NULL,"shipping_cost" decimal(10,2) NOT NULL,"total" decimal(10,2) NOT NULL,"shipping_address" jsonb NOT NULL,"billing_address" jsonb NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+order-db              | 2026-06-13 07:18:26.982 UTC [90] ERROR:  function uuid_generate_v4() does not exist at character 42
+order-db              | 2026-06-13 07:18:26.982 UTC [90] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+order-db              | 2026-06-13 07:18:26.982 UTC [90] STATEMENT:  CREATE TABLE "orders" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid NOT NULL,"order_number" varchar(50) NOT NULL UNIQUE,"status" varchar(20) NOT NULL,"subtotal" decimal(10,2) NOT NULL,"tax" decimal(10,2) NOT NULL,"shipping_cost" decimal(10,2) NOT NULL,"total" decimal(10,2) NOT NULL,"shipping_address" jsonb NOT NULL,"billing_address" jsonb NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+order-db              | 2026-06-13 07:18:42.610 UTC [99] ERROR:  function uuid_generate_v4() does not exist at character 42
+order-db              | 2026-06-13 07:18:42.610 UTC [99] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+order-db              | 2026-06-13 07:18:42.610 UTC [99] STATEMENT:  CREATE TABLE "orders" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid NOT NULL,"order_number" varchar(50) NOT NULL UNIQUE,"status" varchar(20) NOT NULL,"subtotal" decimal(10,2) NOT NULL,"tax" decimal(10,2) NOT NULL,"shipping_cost" decimal(10,2) NOT NULL,"total" decimal(10,2) NOT NULL,"shipping_address" jsonb NOT NULL,"billing_address" jsonb NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+order-db              | 2026-06-13 07:18:56.595 UTC [114] ERROR:  function uuid_generate_v4() does not exist at character 42
+order-db              | 2026-06-13 07:18:56.595 UTC [114] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+order-db              | 2026-06-13 07:18:56.595 UTC [114] STATEMENT:  CREATE TABLE "orders" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid NOT NULL,"order_number" varchar(50) NOT NULL UNIQUE,"status" varchar(20) NOT NULL,"subtotal" decimal(10,2) NOT NULL,"tax" decimal(10,2) NOT NULL,"shipping_cost" decimal(10,2) NOT NULL,"total" decimal(10,2) NOT NULL,"shipping_address" jsonb NOT NULL,"billing_address" jsonb NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+order-db              | 2026-06-13 07:19:22.867 UTC [132] ERROR:  function uuid_generate_v4() does not exist at character 42
+order-db              | 2026-06-13 07:19:22.867 UTC [132] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+order-db              | 2026-06-13 07:19:22.867 UTC [132] STATEMENT:  CREATE TABLE "orders" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid NOT NULL,"order_number" varchar(50) NOT NULL UNIQUE,"status" varchar(20) NOT NULL,"subtotal" decimal(10,2) NOT NULL,"tax" decimal(10,2) NOT NULL,"shipping_cost" decimal(10,2) NOT NULL,"total" decimal(10,2) NOT NULL,"shipping_address" jsonb NOT NULL,"billing_address" jsonb NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+order-db              | 2026-06-13 07:20:14.413 UTC [171] ERROR:  function uuid_generate_v4() does not exist at character 42
+order-db              | 2026-06-13 07:20:14.413 UTC [171] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+order-db              | 2026-06-13 07:20:14.413 UTC [171] STATEMENT:  CREATE TABLE "orders" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid NOT NULL,"order_number" varchar(50) NOT NULL UNIQUE,"status" varchar(20) NOT NULL,"subtotal" decimal(10,2) NOT NULL,"tax" decimal(10,2) NOT NULL,"shipping_cost" decimal(10,2) NOT NULL,"total" decimal(10,2) NOT NULL,"shipping_address" jsonb NOT NULL,"billing_address" jsonb NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+order-db              | 2026-06-13 07:21:14.689 UTC [218] ERROR:  function uuid_generate_v4() does not exist at character 42
+order-db              | 2026-06-13 07:21:14.689 UTC [218] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+order-db              | 2026-06-13 07:21:14.689 UTC [218] STATEMENT:  CREATE TABLE "orders" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid NOT NULL,"order_number" varchar(50) NOT NULL UNIQUE,"status" varchar(20) NOT NULL,"subtotal" decimal(10,2) NOT NULL,"tax" decimal(10,2) NOT NULL,"shipping_cost" decimal(10,2) NOT NULL,"total" decimal(10,2) NOT NULL,"shipping_address" jsonb NOT NULL,"billing_address" jsonb NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+order-db              | 2026-06-13 07:22:14.965 UTC [264] ERROR:  function uuid_generate_v4() does not exist at character 42
+order-db              | 2026-06-13 07:22:14.965 UTC [264] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+order-db              | 2026-06-13 07:22:14.965 UTC [264] STATEMENT:  CREATE TABLE "orders" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid NOT NULL,"order_number" varchar(50) NOT NULL UNIQUE,"status" varchar(20) NOT NULL,"subtotal" decimal(10,2) NOT NULL,"tax" decimal(10,2) NOT NULL,"shipping_cost" decimal(10,2) NOT NULL,"total" decimal(10,2) NOT NULL,"shipping_address" jsonb NOT NULL,"billing_address" jsonb NOT NULL,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+product-db            | creating subdirectories ... ok
+product-db            | selecting dynamic shared memory implementation ... posix
+product-db            | selecting default max_connections ... 100
+product-db            | selecting default shared_buffers ... 128MB
+product-db            | selecting default time zone ... UTC
+product-db            | creating configuration files ... ok
+product-db            | running bootstrap script ... ok
+product-db            | sh: locale: not found
+product-db            | 2026-06-13 07:17:54.088 UTC [34] WARNING:  no usable system locales were found
+product-db            | performing post-bootstrap initialization ... ok
+product-db            | initdb: warning: enabling "trust" authentication for local connections
+auth-db               | 2026-06-13 07:20:47.290 UTC [201] FATAL:  password authentication failed for user "postgres"
+auth-db               | 2026-06-13 07:20:47.290 UTC [201] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db               | 2026-06-13 07:20:47.292 UTC [202] FATAL:  password authentication failed for user "postgres"
+auth-db               | 2026-06-13 07:20:47.292 UTC [202] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db               | 2026-06-13 07:21:02.293 UTC [218] FATAL:  password authentication failed for user "postgres"
+auth-db               | 2026-06-13 07:21:02.293 UTC [218] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db               | 2026-06-13 07:21:02.296 UTC [219] FATAL:  password authentication failed for user "postgres"
+auth-db               | 2026-06-13 07:21:02.296 UTC [219] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db               | 2026-06-13 07:21:17.285 UTC [228] FATAL:  password authentication failed for user "postgres"
+auth-db               | 2026-06-13 07:21:17.285 UTC [228] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db               | 2026-06-13 07:21:17.285 UTC [229] FATAL:  password authentication failed for user "postgres"
+auth-db               | 2026-06-13 07:21:17.285 UTC [229] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db               | 2026-06-13 07:21:32.290 UTC [244] FATAL:  password authentication failed for user "postgres"
+auth-db               | 2026-06-13 07:21:32.290 UTC [244] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db               | 2026-06-13 07:21:32.290 UTC [245] FATAL:  password authentication failed for user "postgres"
+auth-db               | 2026-06-13 07:21:32.290 UTC [245] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db               | 2026-06-13 07:21:47.283 UTC [252] FATAL:  password authentication failed for user "postgres"
+product-service       | [0m[33m[33.109ms] [34;1m[rows:0][0m CREATE TABLE "products" ("id" uuid DEFAULT gen_random_uuid(),"sku" text NOT NULL,"name" text NOT NULL,"description" text,"price" decimal NOT NULL,"category_id" uuid,"images" text[],"stock" bigint DEFAULT 0,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"),CONSTRAINT "fk_products_category" FOREIGN KEY ("category_id") REFERENCES "categories"("id"))
+product-service       | 
+product-service       | 2026/06/13 07:18:04 [32m/app/cmd/main.go:44
+product-service       | [0m[33m[14.412ms] [34;1m[rows:0][0m CREATE INDEX IF NOT EXISTS "idx_products_deleted_at" ON "products" ("deleted_at")
+product-service       | 
+product-service       | 2026/06/13 07:18:04 [32m/app/cmd/main.go:44
+product-service       | [0m[33m[17.980ms] [34;1m[rows:0][0m CREATE UNIQUE INDEX IF NOT EXISTS "idx_products_sku" ON "products" ("sku")
+product-service       | 
+product-service       | 2026/06/13 07:18:04 [32m/app/cmd/main.go:44
+product-service       | [0m[33m[3.072ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'reviews' AND table_type = 'BASE TABLE'
+product-service       | 
+product-service       | 2026/06/13 07:18:04 [32m/app/cmd/main.go:44
+product-service       | [0m[33m[17.224ms] [34;1m[rows:0][0m CREATE TABLE "reviews" ("id" uuid DEFAULT gen_random_uuid(),"product_id" uuid NOT NULL,"user_id" uuid NOT NULL,"rating" bigint NOT NULL,"title" text,"comment" text,"is_verified" boolean DEFAULT false,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"),CONSTRAINT "fk_products_reviews" FOREIGN KEY ("product_id") REFERENCES "products"("id"),CONSTRAINT "chk_reviews_rating" CHECK (rating >= 1 AND rating <= 5))
+product-service       | 
+product-service       | 2026/06/13 07:18:04 [32m/app/cmd/main.go:44
+product-service       | [0m[33m[10.846ms] [34;1m[rows:0][0m CREATE INDEX IF NOT EXISTS "idx_reviews_deleted_at" ON "reviews" ("deleted_at")
+product-service       | [GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+product-service       | 
+product-service       | [GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+product-service       |  - using env:	export GIN_MODE=release
+product-service       |  - using code:	gin.SetMode(gin.ReleaseMode)
+product-service       | 
+product-service       | [GIN-debug] GET    /health                   --> github.com/ecommerce/product-service/internal/handlers.(*HealthHandler).HealthCheck-fm (4 handlers)
+product-service       | [GIN-debug] GET    /ready                    --> github.com/ecommerce/product-service/internal/handlers.(*HealthHandler).ReadinessCheck-fm (4 handlers)
+product-service       | [GIN-debug] GET    /api/v1/products          --> github.com/ecommerce/product-service/internal/handlers.(*ProductHandler).GetProducts-fm (4 handlers)
+product-service       | [GIN-debug] GET    /api/v1/products/:id      --> github.com/ecommerce/product-service/internal/handlers.(*ProductHandler).GetProduct-fm (4 handlers)
+product-service       | [GIN-debug] POST   /api/v1/products          --> github.com/ecommerce/product-service/internal/handlers.(*ProductHandler).CreateProduct-fm (6 handlers)
+product-service       | [GIN-debug] PUT    /api/v1/products/:id      --> github.com/ecommerce/product-service/internal/handlers.(*ProductHandler).UpdateProduct-fm (6 handlers)
+product-service       | [GIN-debug] DELETE /api/v1/products/:id      --> github.com/ecommerce/product-service/internal/handlers.(*ProductHandler).DeleteProduct-fm (6 handlers)
+product-service       | [GIN-debug] GET    /api/v1/categories        --> github.com/ecommerce/product-service/internal/handlers.(*CategoryHandler).GetCategories-fm (4 handlers)
+product-service       | [GIN-debug] GET    /api/v1/categories/:id    --> github.com/ecommerce/product-service/internal/handlers.(*CategoryHandler).GetCategory-fm (4 handlers)
+product-service       | [GIN-debug] POST   /api/v1/categories        --> github.com/ecommerce/product-service/internal/handlers.(*CategoryHandler).CreateCategory-fm (6 handlers)
+product-service       | [GIN-debug] PUT    /api/v1/categories/:id    --> github.com/ecommerce/product-service/internal/handlers.(*CategoryHandler).UpdateCategory-fm (6 handlers)
+product-service       | [GIN-debug] DELETE /api/v1/categories/:id    --> github.com/ecommerce/product-service/internal/handlers.(*CategoryHandler).DeleteCategory-fm (6 handlers)
+product-service       | [GIN-debug] GET    /api/v1/reviews/product/:productId --> github.com/ecommerce/product-service/internal/handlers.(*ReviewHandler).GetProductReviews-fm (4 handlers)
+product-service       | [GIN-debug] POST   /api/v1/reviews           --> github.com/ecommerce/product-service/internal/handlers.(*ReviewHandler).CreateReview-fm (5 handlers)
+product-service       | [GIN-debug] PUT    /api/v1/reviews/:id       --> github.com/ecommerce/product-service/internal/handlers.(*ReviewHandler).UpdateReview-fm (5 handlers)
+product-service       | [GIN-debug] DELETE /api/v1/reviews/:id       --> github.com/ecommerce/product-service/internal/handlers.(*ReviewHandler).DeleteReview-fm (5 handlers)
+product-service       | 2026/06/13 07:18:04 Product Service starting on port 8082
+product-db            | initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
+product-db            | syncing data to disk ... ok
+product-db            | 
+wishlist-service      | [GIN-debug] POST   /api/v1/wishlist/items/:id/move-to-cart --> github.com/ecommerce/wishlist-service/internal/handlers.(*WishlistHandler).MoveToCart-fm (5 handlers)
+wishlist-service      | 2026/06/13 07:18:08 Wishlist Service starting on port 8084
+inventory-service     | 
+inventory-service     | 2026/06/13 07:18:33 [32m/app/cmd/main.go:30
+inventory-service     | [0m[33m[195.054ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'warehouses' AND table_type = 'BASE TABLE'
+inventory-service     | 2026/06/13 07:18:33 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+inventory-service     | 
+inventory-service     | 2026/06/13 07:18:33 [31;1m/app/cmd/main.go:30 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+inventory-service     | [0m[33m[66.426ms] [34;1m[rows:0][0m CREATE TABLE "warehouses" ("id" uuid DEFAULT uuid_generate_v4(),"name" varchar(255) NOT NULL,"code" varchar(50) NOT NULL UNIQUE,"address" jsonb NOT NULL,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+notification-service  | 2026/06/13 07:18:23 [31;1m/app/cmd/main.go:36 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+notification-service  | [0m[33m[20.314ms] [34;1m[rows:0][0m CREATE TABLE "notifications" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid,"type" varchar(50) NOT NULL,"template" varchar(100) NOT NULL,"recipient" varchar(255) NOT NULL,"subject" varchar(255) NOT NULL,"body" text NOT NULL,"status" varchar(20) DEFAULT 'pending',"retry_count" bigint DEFAULT 0,"error_message" text,"sent_at" timestamptz,"created_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+notification-service  | 2026/06/13 07:18:32 No .env file found, using environment variables
+notification-service  | 
+notification-service  | 2026/06/13 07:18:32 [32m/app/cmd/main.go:36 [33mSLOW SQL >= 200ms
+notification-service  | [0m[31;1m[274.714ms] [33m[rows:1][35m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'notifications' AND table_type = 'BASE TABLE'[0m
+notification-service  | 2026/06/13 07:18:32 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+notification-service  | 
+notification-service  | 2026/06/13 07:18:32 [31;1m/app/cmd/main.go:36 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+notification-service  | [0m[33m[29.341ms] [34;1m[rows:0][0m CREATE TABLE "notifications" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid,"type" varchar(50) NOT NULL,"template" varchar(100) NOT NULL,"recipient" varchar(255) NOT NULL,"subject" varchar(255) NOT NULL,"body" text NOT NULL,"status" varchar(20) DEFAULT 'pending',"retry_count" bigint DEFAULT 0,"error_message" text,"sent_at" timestamptz,"created_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+notification-service  | 2026/06/13 07:18:47 No .env file found, using environment variables
+notification-service  | 
+notification-service  | 2026/06/13 07:18:47 [32m/app/cmd/main.go:36
+notification-service  | [0m[33m[136.915ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'notifications' AND table_type = 'BASE TABLE'
+notification-service  | 2026/06/13 07:18:47 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+notification-service  | 
+notification-service  | 2026/06/13 07:18:47 [31;1m/app/cmd/main.go:36 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+notification-service  | [0m[33m[15.520ms] [34;1m[rows:0][0m CREATE TABLE "notifications" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid,"type" varchar(50) NOT NULL,"template" varchar(100) NOT NULL,"recipient" varchar(255) NOT NULL,"subject" varchar(255) NOT NULL,"body" text NOT NULL,"status" varchar(20) DEFAULT 'pending',"retry_count" bigint DEFAULT 0,"error_message" text,"sent_at" timestamptz,"created_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+notification-service  | 2026/06/13 07:19:13 No .env file found, using environment variables
+notification-service  | 
+notification-service  | 2026/06/13 07:19:13 [32m/app/cmd/main.go:36
+notification-service  | [0m[33m[20.518ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'notifications' AND table_type = 'BASE TABLE'
+notification-service  | 
+product-db            | 
+product-db            | Success. You can now start the database server using:
+product-db            | 
+product-db            |     pg_ctl -D /var/lib/postgresql/data -l logfile start
+product-db            | 
+product-db            | waiting for server to start....2026-06-13 07:17:58.017 UTC [40] LOG:  starting PostgreSQL 15.18 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+product-db            | 2026-06-13 07:17:58.024 UTC [40] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+product-db            | 2026-06-13 07:17:58.038 UTC [43] LOG:  database system was shut down at 2026-06-13 07:17:56 UTC
+product-db            | 2026-06-13 07:17:58.058 UTC [40] LOG:  database system is ready to accept connections
+product-db            |  done
+product-db            | server started
+product-db            | CREATE DATABASE
+product-db            | 
+product-db            | 
+product-db            | /usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+product-db            | 
+product-db            | waiting for server to shut down....2026-06-13 07:17:58.410 UTC [40] LOG:  received fast shutdown request
+product-db            | 2026-06-13 07:17:58.418 UTC [40] LOG:  aborting any active transactions
+product-db            | 2026-06-13 07:17:58.430 UTC [40] LOG:  background worker "logical replication launcher" (PID 46) exited with exit code 1
+product-db            | 2026-06-13 07:17:58.440 UTC [41] LOG:  shutting down
+product-db            | 2026-06-13 07:17:58.443 UTC [41] LOG:  checkpoint starting: shutdown immediate
+product-db            | 2026-06-13 07:17:58.911 UTC [41] LOG:  checkpoint complete: wrote 921 buffers (5.6%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.163 s, sync=0.270 s, total=0.471 s; sync files=301, longest=0.059 s, average=0.001 s; distance=4239 kB, estimate=4239 kB
+product-db            | 2026-06-13 07:17:58.925 UTC [40] LOG:  database system is shut down
+product-db            |  done
+cart-db               | 
+cart-db               | fixing permissions on existing directory /var/lib/postgresql/data ... ok
+cart-db               | creating subdirectories ... ok
+cart-db               | selecting dynamic shared memory implementation ... posix
+cart-db               | selecting default max_connections ... 100
+cart-db               | selecting default shared_buffers ... 128MB
+cart-db               | selecting default time zone ... UTC
+cart-db               | creating configuration files ... ok
+cart-db               | running bootstrap script ... ok
+cart-db               | sh: locale: not found
+cart-db               | 2026-06-13 07:17:54.993 UTC [36] WARNING:  no usable system locales were found
+cart-db               | performing post-bootstrap initialization ... ok
+cart-db               | syncing data to disk ... ok
+cart-db               | 
+cart-db               | 
+cart-db               | Success. You can now start the database server using:
+cart-db               | 
+cart-db               |     pg_ctl -D /var/lib/postgresql/data -l logfile start
+cart-db               | 
+cart-db               | initdb: warning: enabling "trust" authentication for local connections
+cart-db               | initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
+cart-db               | waiting for server to start....2026-06-13 07:17:58.252 UTC [42] LOG:  starting PostgreSQL 15.18 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+cart-db               | 2026-06-13 07:17:58.260 UTC [42] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+cart-db               | 2026-06-13 07:17:58.280 UTC [45] LOG:  database system was shut down at 2026-06-13 07:17:56 UTC
+cart-db               | 2026-06-13 07:17:58.328 UTC [42] LOG:  database system is ready to accept connections
+cart-db               |  done
+cart-db               | server started
+cart-db               | CREATE DATABASE
+cart-db               | 
+cart-db               | 
+cart-db               | /usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+cart-db               | 
+cart-db               | 2026-06-13 07:17:58.805 UTC [42] LOG:  received fast shutdown request
+cart-db               | waiting for server to shut down....2026-06-13 07:17:58.808 UTC [42] LOG:  aborting any active transactions
+cart-db               | 2026-06-13 07:17:58.830 UTC [42] LOG:  background worker "logical replication launcher" (PID 48) exited with exit code 1
+cart-db               | 2026-06-13 07:17:58.834 UTC [43] LOG:  shutting down
+cart-db               | 2026-06-13 07:17:58.838 UTC [43] LOG:  checkpoint starting: shutdown immediate
+cart-db               | 2026-06-13 07:17:59.342 UTC [43] LOG:  checkpoint complete: wrote 921 buffers (5.6%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.091 s, sync=0.359 s, total=0.509 s; sync files=301, longest=0.044 s, average=0.002 s; distance=4238 kB, estimate=4238 kB
+cart-db               | 2026-06-13 07:17:59.368 UTC [42] LOG:  database system is shut down
+cart-db               |  done
+cart-db               | server stopped
+cart-db               | 
+cart-db               | PostgreSQL init process complete; ready for start up.
+cart-db               | 
+cart-db               | 2026-06-13 07:17:59.517 UTC [1] LOG:  starting PostgreSQL 15.18 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+cart-db               | 2026-06-13 07:17:59.517 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+cart-db               | 2026-06-13 07:17:59.517 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+cart-db               | 2026-06-13 07:17:59.524 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+cart-db               | 2026-06-13 07:17:59.538 UTC [58] LOG:  database system was shut down at 2026-06-13 07:17:59 UTC
+cart-db               | 2026-06-13 07:17:59.552 UTC [1] LOG:  database system is ready to accept connections
+auth-db               | 2026-06-13 07:21:47.283 UTC [252] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db               | 2026-06-13 07:21:47.283 UTC [253] FATAL:  password authentication failed for user "postgres"
+auth-db               | 2026-06-13 07:21:47.283 UTC [253] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db               | 2026-06-13 07:22:02.287 UTC [269] FATAL:  password authentication failed for user "postgres"
+auth-db               | 2026-06-13 07:22:02.287 UTC [269] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db               | 2026-06-13 07:22:02.289 UTC [270] FATAL:  password authentication failed for user "postgres"
+auth-db               | 2026-06-13 07:22:02.289 UTC [270] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db               | 2026-06-13 07:22:17.283 UTC [279] FATAL:  password authentication failed for user "postgres"
+auth-db               | 2026-06-13 07:22:17.283 UTC [279] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db               | 2026-06-13 07:22:17.284 UTC [280] FATAL:  password authentication failed for user "postgres"
+auth-db               | 2026-06-13 07:22:17.284 UTC [280] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db               | 2026-06-13 07:22:32.296 UTC [297] FATAL:  password authentication failed for user "postgres"
+auth-db               | 2026-06-13 07:22:32.296 UTC [297] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+auth-db               | 2026-06-13 07:22:32.296 UTC [296] FATAL:  password authentication failed for user "postgres"
+auth-db               | 2026-06-13 07:22:32.296 UTC [296] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
+notification-service  | 2026/06/13 07:19:13 [31;1m/app/cmd/main.go:36 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+notification-service  | [0m[33m[4.371ms] [34;1m[rows:0][0m CREATE TABLE "notifications" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid,"type" varchar(50) NOT NULL,"template" varchar(100) NOT NULL,"recipient" varchar(255) NOT NULL,"subject" varchar(255) NOT NULL,"body" text NOT NULL,"status" varchar(20) DEFAULT 'pending',"retry_count" bigint DEFAULT 0,"error_message" text,"sent_at" timestamptz,"created_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+notification-service  | 2026/06/13 07:19:13 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+notification-service  | 2026/06/13 07:20:05 No .env file found, using environment variables
+notification-service  | 
+notification-service  | 2026/06/13 07:20:05 [32m/app/cmd/main.go:36
+notification-service  | [0m[33m[19.081ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'notifications' AND table_type = 'BASE TABLE'
+notification-service  | 
+notification-service  | 2026/06/13 07:20:05 [31;1m/app/cmd/main.go:36 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+notification-service  | [0m[33m[2.639ms] [34;1m[rows:0][0m CREATE TABLE "notifications" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid,"type" varchar(50) NOT NULL,"template" varchar(100) NOT NULL,"recipient" varchar(255) NOT NULL,"subject" varchar(255) NOT NULL,"body" text NOT NULL,"status" varchar(20) DEFAULT 'pending',"retry_count" bigint DEFAULT 0,"error_message" text,"sent_at" timestamptz,"created_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+notification-service  | 2026/06/13 07:20:05 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+notification-service  | 2026/06/13 07:21:05 No .env file found, using environment variables
+notification-service  | 
+notification-service  | 2026/06/13 07:21:05 [32m/app/cmd/main.go:36
+notification-service  | [0m[33m[16.595ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'notifications' AND table_type = 'BASE TABLE'
+notification-service  | 
+notification-service  | 2026/06/13 07:21:05 [31;1m/app/cmd/main.go:36 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+notification-service  | [0m[33m[3.237ms] [34;1m[rows:0][0m CREATE TABLE "notifications" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid,"type" varchar(50) NOT NULL,"template" varchar(100) NOT NULL,"recipient" varchar(255) NOT NULL,"subject" varchar(255) NOT NULL,"body" text NOT NULL,"status" varchar(20) DEFAULT 'pending',"retry_count" bigint DEFAULT 0,"error_message" text,"sent_at" timestamptz,"created_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+notification-service  | 2026/06/13 07:21:05 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+notification-service  | 2026/06/13 07:22:06 No .env file found, using environment variables
+notification-service  | 
+notification-service  | 2026/06/13 07:22:06 [32m/app/cmd/main.go:36
+notification-service  | [0m[33m[15.926ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'notifications' AND table_type = 'BASE TABLE'
+notification-service  | 
+notification-service  | 2026/06/13 07:22:06 [31;1m/app/cmd/main.go:36 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+notification-service  | [0m[33m[3.770ms] [34;1m[rows:0][0m CREATE TABLE "notifications" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid,"type" varchar(50) NOT NULL,"template" varchar(100) NOT NULL,"recipient" varchar(255) NOT NULL,"subject" varchar(255) NOT NULL,"body" text NOT NULL,"status" varchar(20) DEFAULT 'pending',"retry_count" bigint DEFAULT 0,"error_message" text,"sent_at" timestamptz,"created_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+notification-service  | 2026/06/13 07:22:06 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+notification-db       |  done
+inventory-service     | 2026/06/13 07:18:49 No .env file found, using environment variables
+inventory-service     | 
+inventory-service     | 2026/06/13 07:18:49 [32m/app/cmd/main.go:30
+inventory-service     | [0m[33m[59.343ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'warehouses' AND table_type = 'BASE TABLE'
+inventory-service     | 
+inventory-service     | 2026/06/13 07:18:49 [31;1m/app/cmd/main.go:30 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+inventory-service     | [0m[33m[14.504ms] [34;1m[rows:0][0m CREATE TABLE "warehouses" ("id" uuid DEFAULT uuid_generate_v4(),"name" varchar(255) NOT NULL,"code" varchar(50) NOT NULL UNIQUE,"address" jsonb NOT NULL,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+inventory-service     | 2026/06/13 07:18:49 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+inventory-service     | 2026/06/13 07:19:16 No .env file found, using environment variables
+notification-db       | server stopped
+notification-db       | 
+notification-db       | PostgreSQL init process complete; ready for start up.
+notification-db       | 
+notification-db       | 2026-06-13 07:17:58.548 UTC [1] LOG:  starting PostgreSQL 15.18 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+notification-db       | 2026-06-13 07:17:58.548 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+notification-db       | 2026-06-13 07:17:58.549 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+notification-db       | 2026-06-13 07:17:58.559 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+notification-db       | 2026-06-13 07:17:58.575 UTC [57] LOG:  database system was shut down at 2026-06-13 07:17:58 UTC
+notification-db       | 2026-06-13 07:17:58.606 UTC [1] LOG:  database system is ready to accept connections
+notification-db       | 2026-06-13 07:18:03.971 UTC [68] ERROR:  function uuid_generate_v4() does not exist at character 49
+notification-db       | 2026-06-13 07:18:03.971 UTC [68] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+notification-db       | 2026-06-13 07:18:03.971 UTC [68] STATEMENT:  CREATE TABLE "notifications" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid,"type" varchar(50) NOT NULL,"template" varchar(100) NOT NULL,"recipient" varchar(255) NOT NULL,"subject" varchar(255) NOT NULL,"body" text NOT NULL,"status" varchar(20) DEFAULT 'pending',"retry_count" bigint DEFAULT 0,"error_message" text,"sent_at" timestamptz,"created_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+payment-db            | server stopped
+payment-db            | 
+payment-db            | PostgreSQL init process complete; ready for start up.
+payment-db            | 
+product-db            | server stopped
+payment-service    | [0m[33m[11.538ms] [34;1m[rows:0][0m CREATE TABLE "payments" ("id" uuid DEFAULT uuid_generate_v4(),"order_id" uuid NOT NULL UNIQUE,"user_id" uuid NOT NULL,"stripe_payment_intent_id" varchar(255) UNIQUE,"amount" decimal(10,2) NOT NULL,"currency" varchar(3) DEFAULT 'usd',"status" varchar(20) NOT NULL,"payment_method" varchar(50),"client_secret" varchar(500),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+payment-service       | 2026/06/13 07:18:23 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+payment-db            | 2026-06-13 07:17:59.268 UTC [1] LOG:  starting PostgreSQL 15.18 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+payment-db            | 2026-06-13 07:17:59.268 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+payment-db            | 2026-06-13 07:17:59.268 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+payment-db            | 2026-06-13 07:17:59.320 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+payment-db            | 2026-06-13 07:17:59.349 UTC [57] LOG:  database system was shut down at 2026-06-13 07:17:59 UTC
+payment-db            | 2026-06-13 07:17:59.377 UTC [1] LOG:  database system is ready to accept connections
+payment-db            | 2026-06-13 07:18:03.482 UTC [68] ERROR:  function uuid_generate_v4() does not exist at character 44
+payment-db            | 2026-06-13 07:18:03.482 UTC [68] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+payment-db            | 2026-06-13 07:18:03.482 UTC [68] STATEMENT:  CREATE TABLE "payments" ("id" uuid DEFAULT uuid_generate_v4(),"order_id" uuid NOT NULL UNIQUE,"user_id" uuid NOT NULL,"stripe_payment_intent_id" varchar(255) UNIQUE,"amount" decimal(10,2) NOT NULL,"currency" varchar(3) DEFAULT 'usd',"status" varchar(20) NOT NULL,"payment_method" varchar(50),"client_secret" varchar(500),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+payment-db            | 2026-06-13 07:18:05.800 UTC [69] ERROR:  function uuid_generate_v4() does not exist at character 44
+payment-db            | 2026-06-13 07:18:05.800 UTC [69] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+payment-db            | 2026-06-13 07:18:05.800 UTC [69] STATEMENT:  CREATE TABLE "payments" ("id" uuid DEFAULT uuid_generate_v4(),"order_id" uuid NOT NULL UNIQUE,"user_id" uuid NOT NULL,"stripe_payment_intent_id" varchar(255) UNIQUE,"amount" decimal(10,2) NOT NULL,"currency" varchar(3) DEFAULT 'usd',"status" varchar(20) NOT NULL,"payment_method" varchar(50),"client_secret" varchar(500),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+payment-db            | 2026-06-13 07:18:08.916 UTC [70] ERROR:  function uuid_generate_v4() does not exist at character 44
+payment-db            | 2026-06-13 07:18:08.916 UTC [70] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+payment-db            | 2026-06-13 07:18:08.916 UTC [70] STATEMENT:  CREATE TABLE "payments" ("id" uuid DEFAULT uuid_generate_v4(),"order_id" uuid NOT NULL UNIQUE,"user_id" uuid NOT NULL,"stripe_payment_intent_id" varchar(255) UNIQUE,"amount" decimal(10,2) NOT NULL,"currency" varchar(3) DEFAULT 'usd',"status" varchar(20) NOT NULL,"payment_method" varchar(50),"client_secret" varchar(500),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+payment-db            | 2026-06-13 07:18:11.810 UTC [71] ERROR:  function uuid_generate_v4() does not exist at character 44
+payment-db            | 2026-06-13 07:18:11.810 UTC [71] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+payment-db            | 2026-06-13 07:18:11.810 UTC [71] STATEMENT:  CREATE TABLE "payments" ("id" uuid DEFAULT uuid_generate_v4(),"order_id" uuid NOT NULL UNIQUE,"user_id" uuid NOT NULL,"stripe_payment_intent_id" varchar(255) UNIQUE,"amount" decimal(10,2) NOT NULL,"currency" varchar(3) DEFAULT 'usd',"status" varchar(20) NOT NULL,"payment_method" varchar(50),"client_secret" varchar(500),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+payment-db            | 2026-06-13 07:18:15.199 UTC [79] ERROR:  function uuid_generate_v4() does not exist at character 44
+payment-db            | 2026-06-13 07:18:15.199 UTC [79] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+payment-db            | 2026-06-13 07:18:15.199 UTC [79] STATEMENT:  CREATE TABLE "payments" ("id" uuid DEFAULT uuid_generate_v4(),"order_id" uuid NOT NULL UNIQUE,"user_id" uuid NOT NULL,"stripe_payment_intent_id" varchar(255) UNIQUE,"amount" decimal(10,2) NOT NULL,"currency" varchar(3) DEFAULT 'usd',"status" varchar(20) NOT NULL,"payment_method" varchar(50),"client_secret" varchar(500),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+payment-db            | 2026-06-13 07:18:18.151 UTC [80] ERROR:  function uuid_generate_v4() does not exist at character 44
+payment-db            | 2026-06-13 07:18:18.151 UTC [80] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+payment-service       | 2026/06/13 07:18:31 No .env file found, using environment variables
+payment-service       | 
+payment-service       | 2026/06/13 07:18:31 [32m/app/cmd/main.go:35
+payment-db            | 2026-06-13 07:18:18.151 UTC [80] STATEMENT:  CREATE TABLE "payments" ("id" uuid DEFAULT uuid_generate_v4(),"order_id" uuid NOT NULL UNIQUE,"user_id" uuid NOT NULL,"stripe_payment_intent_id" varchar(255) UNIQUE,"amount" decimal(10,2) NOT NULL,"currency" varchar(3) DEFAULT 'usd',"status" varchar(20) NOT NULL,"payment_method" varchar(50),"client_secret" varchar(500),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+payment-db            | 2026-06-13 07:18:23.023 UTC [88] ERROR:  function uuid_generate_v4() does not exist at character 44
+payment-db            | 2026-06-13 07:18:23.023 UTC [88] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+payment-db            | 2026-06-13 07:18:23.023 UTC [88] STATEMENT:  CREATE TABLE "payments" ("id" uuid DEFAULT uuid_generate_v4(),"order_id" uuid NOT NULL UNIQUE,"user_id" uuid NOT NULL,"stripe_payment_intent_id" varchar(255) UNIQUE,"amount" decimal(10,2) NOT NULL,"currency" varchar(3) DEFAULT 'usd',"status" varchar(20) NOT NULL,"payment_method" varchar(50),"client_secret" varchar(500),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+payment-db            | 2026-06-13 07:18:31.185 UTC [90] ERROR:  function uuid_generate_v4() does not exist at character 44
+payment-db            | 2026-06-13 07:18:31.185 UTC [90] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+payment-db            | 2026-06-13 07:18:31.185 UTC [90] STATEMENT:  CREATE TABLE "payments" ("id" uuid DEFAULT uuid_generate_v4(),"order_id" uuid NOT NULL UNIQUE,"user_id" uuid NOT NULL,"stripe_payment_intent_id" varchar(255) UNIQUE,"amount" decimal(10,2) NOT NULL,"currency" varchar(3) DEFAULT 'usd',"status" varchar(20) NOT NULL,"payment_method" varchar(50),"client_secret" varchar(500),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+payment-db            | 2026-06-13 07:18:46.292 UTC [104] ERROR:  function uuid_generate_v4() does not exist at character 44
+payment-db            | 2026-06-13 07:18:46.292 UTC [104] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+payment-db            | 2026-06-13 07:18:46.292 UTC [104] STATEMENT:  CREATE TABLE "payments" ("id" uuid DEFAULT uuid_generate_v4(),"order_id" uuid NOT NULL UNIQUE,"user_id" uuid NOT NULL,"stripe_payment_intent_id" varchar(255) UNIQUE,"amount" decimal(10,2) NOT NULL,"currency" varchar(3) DEFAULT 'usd',"status" varchar(20) NOT NULL,"payment_method" varchar(50),"client_secret" varchar(500),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+product-db            | 
+product-db            | PostgreSQL init process complete; ready for start up.
+product-db            | 
+product-db            | 2026-06-13 07:17:59.179 UTC [1] LOG:  starting PostgreSQL 15.18 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+product-db            | 2026-06-13 07:17:59.179 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+payment-service       | [0m[33m[50.140ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'payments' AND table_type = 'BASE TABLE'
+payment-service       | 2026/06/13 07:18:31 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+auth-service          | [GIN-debug] POST   /api/v1/auth/forgot-password --> github.com/ecommerce/auth-service/internal/handlers.(*AuthHandler).ForgotPassword-fm (4 handlers)
+auth-service          | [GIN-debug] POST   /api/v1/auth/reset-password --> github.com/ecommerce/auth-service/internal/handlers.(*AuthHandler).ResetPassword-fm (4 handlers)
+auth-service          | [GIN-debug] POST   /api/v1/auth/logout       --> github.com/ecommerce/auth-service/internal/handlers.(*AuthHandler).Logout-fm (5 handlers)
+auth-service          | [GIN-debug] GET    /api/v1/auth/profile      --> github.com/ecommerce/auth-service/internal/handlers.(*AuthHandler).GetProfile-fm (5 handlers)
+auth-service          | [GIN-debug] PUT    /api/v1/auth/profile      --> github.com/ecommerce/auth-service/internal/handlers.(*AuthHandler).UpdateProfile-fm (5 handlers)
+auth-service          | [GIN] 2026/06/13 - 07:19:17 | 204 |   4.45ms |  142.250.206.59 | OPTIONS  "/api/v1/auth/register"
+auth-service          | [GIN] 2026/06/13 - 07:19:17 | 400 |    3.1ms |  142.250.206.59 | POST     "/api/v1/auth/register"
+product-db            | 2026-06-13 07:17:59.179 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+product-db            | 2026-06-13 07:17:59.197 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+product-db            | 2026-06-13 07:17:59.230 UTC [56] LOG:  database system was shut down at 2026-06-13 07:17:58 UTC
+notification-db       | 2026-06-13 07:18:06.621 UTC [69] ERROR:  function uuid_generate_v4() does not exist at character 49
+notification-db       | 2026-06-13 07:18:06.621 UTC [69] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+payment-db            | 2026-06-13 07:19:12.456 UTC [122] ERROR:  function uuid_generate_v4() does not exist at character 44
+payment-db            | 2026-06-13 07:19:12.456 UTC [122] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+payment-db            | 2026-06-13 07:19:12.456 UTC [122] STATEMENT:  CREATE TABLE "payments" ("id" uuid DEFAULT uuid_generate_v4(),"order_id" uuid NOT NULL UNIQUE,"user_id" uuid NOT NULL,"stripe_payment_intent_id" varchar(255) UNIQUE,"amount" decimal(10,2) NOT NULL,"currency" varchar(3) DEFAULT 'usd',"status" varchar(20) NOT NULL,"payment_method" varchar(50),"client_secret" varchar(500),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+payment-db            | 2026-06-13 07:20:04.091 UTC [160] ERROR:  function uuid_generate_v4() does not exist at character 44
+payment-db            | 2026-06-13 07:20:04.091 UTC [160] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+payment-db            | 2026-06-13 07:20:04.091 UTC [160] STATEMENT:  CREATE TABLE "payments" ("id" uuid DEFAULT uuid_generate_v4(),"order_id" uuid NOT NULL UNIQUE,"user_id" uuid NOT NULL,"stripe_payment_intent_id" varchar(255) UNIQUE,"amount" decimal(10,2) NOT NULL,"currency" varchar(3) DEFAULT 'usd',"status" varchar(20) NOT NULL,"payment_method" varchar(50),"client_secret" varchar(500),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+inventory-service     | 
+inventory-service     | 2026/06/13 07:19:16 [32m/app/cmd/main.go:30
+inventory-service     | [0m[33m[18.790ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'warehouses' AND table_type = 'BASE TABLE'
+inventory-service     | 2026/06/13 07:19:16 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+inventory-service     | 
+inventory-service     | 2026/06/13 07:19:16 [31;1m/app/cmd/main.go:30 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+notification-db       | 2026-06-13 07:18:06.621 UTC [69] STATEMENT:  CREATE TABLE "notifications" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid,"type" varchar(50) NOT NULL,"template" varchar(100) NOT NULL,"recipient" varchar(255) NOT NULL,"subject" varchar(255) NOT NULL,"body" text NOT NULL,"status" varchar(20) DEFAULT 'pending',"retry_count" bigint DEFAULT 0,"error_message" text,"sent_at" timestamptz,"created_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+notification-db       | 2026-06-13 07:18:09.711 UTC [70] ERROR:  function uuid_generate_v4() does not exist at character 49
+payment-service       | 
+payment-service       | 2026/06/13 07:18:31 [31;1m/app/cmd/main.go:35 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+payment-service       | [0m[33m[5.579ms] [34;1m[rows:0][0m CREATE TABLE "payments" ("id" uuid DEFAULT uuid_generate_v4(),"order_id" uuid NOT NULL UNIQUE,"user_id" uuid NOT NULL,"stripe_payment_intent_id" varchar(255) UNIQUE,"amount" decimal(10,2) NOT NULL,"currency" varchar(3) DEFAULT 'usd',"status" varchar(20) NOT NULL,"payment_method" varchar(50),"client_secret" varchar(500),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+payment-service       | 2026/06/13 07:18:46 No .env file found, using environment variables
+payment-service       | 
+payment-service       | 2026/06/13 07:18:46 [32m/app/cmd/main.go:35
+payment-service       | [0m[33m[80.329ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'payments' AND table_type = 'BASE TABLE'
+payment-service       | 2026/06/13 07:18:46 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+payment-service       | 
+payment-service       | 2026/06/13 07:18:46 [31;1m/app/cmd/main.go:35 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+payment-service       | [0m[33m[5.438ms] [34;1m[rows:0][0m CREATE TABLE "payments" ("id" uuid DEFAULT uuid_generate_v4(),"order_id" uuid NOT NULL UNIQUE,"user_id" uuid NOT NULL,"stripe_payment_intent_id" varchar(255) UNIQUE,"amount" decimal(10,2) NOT NULL,"currency" varchar(3) DEFAULT 'usd',"status" varchar(20) NOT NULL,"payment_method" varchar(50),"client_secret" varchar(500),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+payment-service       | 2026/06/13 07:19:12 No .env file found, using environment variables
+payment-service       | 
+payment-service       | 2026/06/13 07:19:12 [32m/app/cmd/main.go:35
+notification-db       | 2026-06-13 07:18:09.711 UTC [70] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+notification-db       | 2026-06-13 07:18:09.711 UTC [70] STATEMENT:  CREATE TABLE "notifications" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid,"type" varchar(50) NOT NULL,"template" varchar(100) NOT NULL,"recipient" varchar(255) NOT NULL,"subject" varchar(255) NOT NULL,"body" text NOT NULL,"status" varchar(20) DEFAULT 'pending',"retry_count" bigint DEFAULT 0,"error_message" text,"sent_at" timestamptz,"created_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+notification-db       | 2026-06-13 07:18:11.953 UTC [71] ERROR:  function uuid_generate_v4() does not exist at character 49
+notification-db       | 2026-06-13 07:18:11.953 UTC [71] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+notification-db       | 2026-06-13 07:18:11.953 UTC [71] STATEMENT:  CREATE TABLE "notifications" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid,"type" varchar(50) NOT NULL,"template" varchar(100) NOT NULL,"recipient" varchar(255) NOT NULL,"subject" varchar(255) NOT NULL,"body" text NOT NULL,"status" varchar(20) DEFAULT 'pending',"retry_count" bigint DEFAULT 0,"error_message" text,"sent_at" timestamptz,"created_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+payment-db            | 2026-06-13 07:21:04.378 UTC [207] ERROR:  function uuid_generate_v4() does not exist at character 44
+payment-db            | 2026-06-13 07:21:04.378 UTC [207] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+payment-db            | 2026-06-13 07:21:04.378 UTC [207] STATEMENT:  CREATE TABLE "payments" ("id" uuid DEFAULT uuid_generate_v4(),"order_id" uuid NOT NULL UNIQUE,"user_id" uuid NOT NULL,"stripe_payment_intent_id" varchar(255) UNIQUE,"amount" decimal(10,2) NOT NULL,"currency" varchar(3) DEFAULT 'usd',"status" varchar(20) NOT NULL,"payment_method" varchar(50),"client_secret" varchar(500),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+payment-db            | 2026-06-13 07:22:04.645 UTC [253] ERROR:  function uuid_generate_v4() does not exist at character 44
+payment-db            | 2026-06-13 07:22:04.645 UTC [253] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+payment-db            | 2026-06-13 07:22:04.645 UTC [253] STATEMENT:  CREATE TABLE "payments" ("id" uuid DEFAULT uuid_generate_v4(),"order_id" uuid NOT NULL UNIQUE,"user_id" uuid NOT NULL,"stripe_payment_intent_id" varchar(255) UNIQUE,"amount" decimal(10,2) NOT NULL,"currency" varchar(3) DEFAULT 'usd',"status" varchar(20) NOT NULL,"payment_method" varchar(50),"client_secret" varchar(500),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+product-db            | 2026-06-13 07:17:59.245 UTC [1] LOG:  database system is ready to accept connections
+notification-db       | 2026-06-13 07:18:15.749 UTC [79] ERROR:  function uuid_generate_v4() does not exist at character 49
+notification-db       | 2026-06-13 07:18:15.749 UTC [79] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+notification-db       | 2026-06-13 07:18:15.749 UTC [79] STATEMENT:  CREATE TABLE "notifications" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid,"type" varchar(50) NOT NULL,"template" varchar(100) NOT NULL,"recipient" varchar(255) NOT NULL,"subject" varchar(255) NOT NULL,"body" text NOT NULL,"status" varchar(20) DEFAULT 'pending',"retry_count" bigint DEFAULT 0,"error_message" text,"sent_at" timestamptz,"created_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+notification-db       | 2026-06-13 07:18:18.600 UTC [80] ERROR:  function uuid_generate_v4() does not exist at character 49
+payment-service       | [0m[33m[26.362ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'payments' AND table_type = 'BASE TABLE'
+payment-service       | 
+payment-service       | 2026/06/13 07:19:12 [31;1m/app/cmd/main.go:35 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+payment-service       | [0m[33m[4.015ms] [34;1m[rows:0][0m CREATE TABLE "payments" ("id" uuid DEFAULT uuid_generate_v4(),"order_id" uuid NOT NULL UNIQUE,"user_id" uuid NOT NULL,"stripe_payment_intent_id" varchar(255) UNIQUE,"amount" decimal(10,2) NOT NULL,"currency" varchar(3) DEFAULT 'usd',"status" varchar(20) NOT NULL,"payment_method" varchar(50),"client_secret" varchar(500),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+payment-service       | 2026/06/13 07:19:12 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+payment-service       | 2026/06/13 07:20:04 No .env file found, using environment variables
+notification-db       | 2026-06-13 07:18:18.600 UTC [80] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+notification-db       | 2026-06-13 07:18:18.600 UTC [80] STATEMENT:  CREATE TABLE "notifications" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid,"type" varchar(50) NOT NULL,"template" varchar(100) NOT NULL,"recipient" varchar(255) NOT NULL,"subject" varchar(255) NOT NULL,"body" text NOT NULL,"status" varchar(20) DEFAULT 'pending',"retry_count" bigint DEFAULT 0,"error_message" text,"sent_at" timestamptz,"created_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+notification-db       | 2026-06-13 07:18:23.324 UTC [81] ERROR:  function uuid_generate_v4() does not exist at character 49
+notification-db       | 2026-06-13 07:18:23.324 UTC [81] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+inventory-service     | [0m[33m[4.481ms] [34;1m[rows:0][0m CREATE TABLE "warehouses" ("id" uuid DEFAULT uuid_generate_v4(),"name" varchar(255) NOT NULL,"code" varchar(50) NOT NULL UNIQUE,"address" jsonb NOT NULL,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+inventory-service     | 2026/06/13 07:20:07 No .env file found, using environment variables
+inventory-service     | 
+inventory-service     | 2026/06/13 07:20:07 [32m/app/cmd/main.go:30
+inventory-service     | [0m[33m[14.710ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'warehouses' AND table_type = 'BASE TABLE'
+inventory-service     | 2026/06/13 07:20:07 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+inventory-service     | 
+inventory-service     | 2026/06/13 07:20:07 [31;1m/app/cmd/main.go:30 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+inventory-service     | [0m[33m[2.377ms] [34;1m[rows:0][0m CREATE TABLE "warehouses" ("id" uuid DEFAULT uuid_generate_v4(),"name" varchar(255) NOT NULL,"code" varchar(50) NOT NULL UNIQUE,"address" jsonb NOT NULL,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+inventory-service     | 2026/06/13 07:21:08 No .env file found, using environment variables
+inventory-service     | 
+payment-service       | 
+payment-service       | 2026/06/13 07:20:04 [32m/app/cmd/main.go:35
+inventory-service     | 2026/06/13 07:21:08 [32m/app/cmd/main.go:30
+inventory-service     | [0m[33m[16.851ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'warehouses' AND table_type = 'BASE TABLE'
+inventory-service     | 2026/06/13 07:21:08 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+inventory-service     | 
+inventory-service     | 2026/06/13 07:21:08 [31;1m/app/cmd/main.go:30 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+inventory-service     | [0m[33m[3.008ms] [34;1m[rows:0][0m CREATE TABLE "warehouses" ("id" uuid DEFAULT uuid_generate_v4(),"name" varchar(255) NOT NULL,"code" varchar(50) NOT NULL UNIQUE,"address" jsonb NOT NULL,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+inventory-service     | 2026/06/13 07:22:08 No .env file found, using environment variables
+payment-service       | [0m[33m[22.639ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'payments' AND table_type = 'BASE TABLE'
+payment-service       | 2026/06/13 07:20:04 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+payment-service       | 
+payment-service       | 2026/06/13 07:20:04 [31;1m/app/cmd/main.go:35 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+payment-service       | [0m[33m[6.190ms] [34;1m[rows:0][0m CREATE TABLE "payments" ("id" uuid DEFAULT uuid_generate_v4(),"order_id" uuid NOT NULL UNIQUE,"user_id" uuid NOT NULL,"stripe_payment_intent_id" varchar(255) UNIQUE,"amount" decimal(10,2) NOT NULL,"currency" varchar(3) DEFAULT 'usd',"status" varchar(20) NOT NULL,"payment_method" varchar(50),"client_secret" varchar(500),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+payment-service       | 2026/06/13 07:21:04 No .env file found, using environment variables
+notification-db       | 2026-06-13 07:18:23.324 UTC [81] STATEMENT:  CREATE TABLE "notifications" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid,"type" varchar(50) NOT NULL,"template" varchar(100) NOT NULL,"recipient" varchar(255) NOT NULL,"subject" varchar(255) NOT NULL,"body" text NOT NULL,"status" varchar(20) DEFAULT 'pending',"retry_count" bigint DEFAULT 0,"error_message" text,"sent_at" timestamptz,"created_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+notification-db       | 2026-06-13 07:18:32.811 UTC [89] ERROR:  function uuid_generate_v4() does not exist at character 49
+notification-db       | 2026-06-13 07:18:32.811 UTC [89] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+payment-service       | 
+payment-service       | 2026/06/13 07:21:04 [32m/app/cmd/main.go:35
+payment-service       | [0m[33m[14.536ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'payments' AND table_type = 'BASE TABLE'
+payment-service       | 
+inventory-service     | 
+inventory-service     | 2026/06/13 07:22:08 [32m/app/cmd/main.go:30
+inventory-service     | [0m[33m[18.184ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'warehouses' AND table_type = 'BASE TABLE'
+inventory-service     | 2026/06/13 07:22:08 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+inventory-service     | 
+inventory-service     | 2026/06/13 07:22:08 [31;1m/app/cmd/main.go:30 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+inventory-service     | [0m[33m[3.611ms] [34;1m[rows:0][0m CREATE TABLE "warehouses" ("id" uuid DEFAULT uuid_generate_v4(),"name" varchar(255) NOT NULL,"code" varchar(50) NOT NULL UNIQUE,"address" jsonb NOT NULL,"is_active" boolean DEFAULT true,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+payment-service       | 2026/06/13 07:21:04 [31;1m/app/cmd/main.go:35 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+payment-service       | 2026/06/13 07:21:04 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+payment-service       | [0m[33m[2.334ms] [34;1m[rows:0][0m CREATE TABLE "payments" ("id" uuid DEFAULT uuid_generate_v4(),"order_id" uuid NOT NULL UNIQUE,"user_id" uuid NOT NULL,"stripe_payment_intent_id" varchar(255) UNIQUE,"amount" decimal(10,2) NOT NULL,"currency" varchar(3) DEFAULT 'usd',"status" varchar(20) NOT NULL,"payment_method" varchar(50),"client_secret" varchar(500),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+payment-service       | 2026/06/13 07:22:04 No .env file found, using environment variables
+payment-service       | 
+payment-service       | 2026/06/13 07:22:04 [32m/app/cmd/main.go:35
+payment-service       | [0m[33m[17.407ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'payments' AND table_type = 'BASE TABLE'
+payment-service       | 
+payment-service       | 2026/06/13 07:22:04 [31;1m/app/cmd/main.go:35 [35;1mERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+payment-service       | [0m[33m[3.024ms] [34;1m[rows:0][0m CREATE TABLE "payments" ("id" uuid DEFAULT uuid_generate_v4(),"order_id" uuid NOT NULL UNIQUE,"user_id" uuid NOT NULL,"stripe_payment_intent_id" varchar(255) UNIQUE,"amount" decimal(10,2) NOT NULL,"currency" varchar(3) DEFAULT 'usd',"status" varchar(20) NOT NULL,"payment_method" varchar(50),"client_secret" varchar(500),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+payment-service       | 2026/06/13 07:22:04 Failed to migrate database: ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+notification-db       | 2026-06-13 07:18:32.811 UTC [89] STATEMENT:  CREATE TABLE "notifications" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid,"type" varchar(50) NOT NULL,"template" varchar(100) NOT NULL,"recipient" varchar(255) NOT NULL,"subject" varchar(255) NOT NULL,"body" text NOT NULL,"status" varchar(20) DEFAULT 'pending',"retry_count" bigint DEFAULT 0,"error_message" text,"sent_at" timestamptz,"created_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+notification-db       | 2026-06-13 07:18:47.718 UTC [104] ERROR:  function uuid_generate_v4() does not exist at character 49
+notification-db       | 2026-06-13 07:18:47.718 UTC [104] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+notification-db       | 2026-06-13 07:18:47.718 UTC [104] STATEMENT:  CREATE TABLE "notifications" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid,"type" varchar(50) NOT NULL,"template" varchar(100) NOT NULL,"recipient" varchar(255) NOT NULL,"subject" varchar(255) NOT NULL,"body" text NOT NULL,"status" varchar(20) DEFAULT 'pending',"retry_count" bigint DEFAULT 0,"error_message" text,"sent_at" timestamptz,"created_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+notification-db       | 2026-06-13 07:19:13.910 UTC [121] ERROR:  function uuid_generate_v4() does not exist at character 49
+notification-db       | 2026-06-13 07:19:13.910 UTC [121] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+notification-db       | 2026-06-13 07:19:13.910 UTC [121] STATEMENT:  CREATE TABLE "notifications" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid,"type" varchar(50) NOT NULL,"template" varchar(100) NOT NULL,"recipient" varchar(255) NOT NULL,"subject" varchar(255) NOT NULL,"body" text NOT NULL,"status" varchar(20) DEFAULT 'pending',"retry_count" bigint DEFAULT 0,"error_message" text,"sent_at" timestamptz,"created_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+notification-db       | 2026-06-13 07:20:05.577 UTC [159] ERROR:  function uuid_generate_v4() does not exist at character 49
+notification-db       | 2026-06-13 07:20:05.577 UTC [159] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+notification-db       | 2026-06-13 07:20:05.577 UTC [159] STATEMENT:  CREATE TABLE "notifications" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid,"type" varchar(50) NOT NULL,"template" varchar(100) NOT NULL,"recipient" varchar(255) NOT NULL,"subject" varchar(255) NOT NULL,"body" text NOT NULL,"status" varchar(20) DEFAULT 'pending',"retry_count" bigint DEFAULT 0,"error_message" text,"sent_at" timestamptz,"created_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+notification-db       | 2026-06-13 07:21:05.952 UTC [207] ERROR:  function uuid_generate_v4() does not exist at character 49
+notification-db       | 2026-06-13 07:21:05.952 UTC [207] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+notification-db       | 2026-06-13 07:21:05.952 UTC [207] STATEMENT:  CREATE TABLE "notifications" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid,"type" varchar(50) NOT NULL,"template" varchar(100) NOT NULL,"recipient" varchar(255) NOT NULL,"subject" varchar(255) NOT NULL,"body" text NOT NULL,"status" varchar(20) DEFAULT 'pending',"retry_count" bigint DEFAULT 0,"error_message" text,"sent_at" timestamptz,"created_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+notification-db       | 2026-06-13 07:22:06.268 UTC [252] ERROR:  function uuid_generate_v4() does not exist at character 49
+notification-db       | 2026-06-13 07:22:06.268 UTC [252] HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+notification-db       | 2026-06-13 07:22:06.268 UTC [252] STATEMENT:  CREATE TABLE "notifications" ("id" uuid DEFAULT uuid_generate_v4(),"user_id" uuid,"type" varchar(50) NOT NULL,"template" varchar(100) NOT NULL,"recipient" varchar(255) NOT NULL,"subject" varchar(255) NOT NULL,"body" text NOT NULL,"status" varchar(20) DEFAULT 'pending',"retry_count" bigint DEFAULT 0,"error_message" text,"sent_at" timestamptz,"created_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))

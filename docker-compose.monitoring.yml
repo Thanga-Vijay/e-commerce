@@ -87,7 +87,7 @@ services:
       - "9121:9121"
     networks:
       - monitoring-network
-      - backend-network
+      - e-commerce_ecommerce-network
     restart: unless-stopped
     depends_on:
       - redis
@@ -102,7 +102,7 @@ services:
       - "9187:9187"
     networks:
       - monitoring-network
-      - backend-network
+      - e-commerce_ecommerce-network
     restart: unless-stopped
     depends_on:
       - auth-db
@@ -126,7 +126,7 @@ services:
 networks:
   monitoring-network:
     driver: bridge
-  backend-network:
+  e-commerce_ecommerce-network:
     external: true
 
 volumes:

@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"encoding/json"
 	"payment-service/config"
 	"payment-service/internal/models"
 	"payment-service/internal/repository"
@@ -165,7 +166,7 @@ func (s *paymentService) ProcessRefund(paymentID uuid.UUID, req CreateRefundRequ
 	}
 
 	if req.Reason != "" {
-		params.Reason = stripe.String(stripe.RefundReasonRequestedByCustomer)
+		params.Reason = stripe.String("requested_by_customer")
 	}
 
 	stripeRefund, err := refund.New(params)
@@ -214,7 +215,7 @@ func (s *paymentService) HandleWebhook(payload []byte, signature string) error {
 
 func (s *paymentService) handlePaymentIntentSucceeded(event stripe.Event) error {
 	var intent stripe.PaymentIntent
-	if err := event.DataObjectJSON.UnmarshalJSON([]byte(event.Data.Raw), &intent); err != nil {
+	if err := json.Unmarshal([]byte(event.Data.Raw), &intent); err != nil {
 		return fmt.Errorf("failed to parse payment intent: %w", err)
 	}
 
@@ -240,7 +241,7 @@ func (s *paymentService) handlePaymentIntentSucceeded(event stripe.Event) error 
 
 func (s *paymentService) handlePaymentIntentFailed(event stripe.Event) error {
 	var intent stripe.PaymentIntent
-	if err := event.DataObjectJSON.UnmarshalJSON([]byte(event.Data.Raw), &intent); err != nil {
+	if err := json.Unmarshal([]byte(event.Data.Raw), &intent); err != nil {
 		return fmt.Errorf("failed to parse payment intent: %w", err)
 	}
 
@@ -263,7 +264,7 @@ func (s *paymentService) handlePaymentIntentFailed(event stripe.Event) error {
 
 func (s *paymentService) handleChargeRefunded(event stripe.Event) error {
 	var charge stripe.Charge
-	if err := event.DataObjectJSON.UnmarshalJSON([]byte(event.Data.Raw), &charge); err != nil {
+	if err := json.Unmarshal([]byte(event.Data.Raw), &charge); err != nil {
 		return fmt.Errorf("failed to parse charge: %w", err)
 	}
 
