@@ -3,7 +3,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Create payments table
 CREATE TABLE IF NOT EXISTS payments (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID UNIQUE NOT NULL,
     user_id UUID NOT NULL,
     stripe_payment_intent_id VARCHAR(255) UNIQUE,
@@ -25,7 +25,7 @@ CREATE INDEX IF NOT EXISTS idx_payments_deleted_at ON payments(deleted_at);
 
 -- Create refunds table
 CREATE TABLE IF NOT EXISTS refunds (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     payment_id UUID NOT NULL REFERENCES payments(id) ON DELETE CASCADE,
     stripe_refund_id VARCHAR(255) UNIQUE,
     amount DECIMAL(10,2) NOT NULL,

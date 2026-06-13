@@ -271,3 +271,9 @@ docker-compose -f docker-compose.monitring.yml up -d
 docker-compose ps
 docker-compose -f docker-compose.kafka.yml ps
 ```
+
+docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.kafka.yml \
+  -f docker-compose.monitoring.yml config | grep DATA_SOURCE_NAME \
+  up -d

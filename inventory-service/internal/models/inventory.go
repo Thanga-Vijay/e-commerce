@@ -45,7 +45,7 @@ func (a Address) Value() (driver.Value, error) {
 
 // Warehouse represents a warehouse location
 type Warehouse struct {
-	ID        uuid.UUID      `gorm:"type:uuid;primary_key;default:uuid_generate_v4()" json:"id"`
+	ID        uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
 	Name      string         `gorm:"type:varchar(255);not null" json:"name"`
 	Code      string         `gorm:"type:varchar(50);unique;not null" json:"code"`
 	Address   Address        `gorm:"type:jsonb;not null" json:"address"`
@@ -57,7 +57,7 @@ type Warehouse struct {
 
 // Inventory represents product inventory levels
 type Inventory struct {
-	ID                 uuid.UUID      `gorm:"type:uuid;primary_key;default:uuid_generate_v4()" json:"id"`
+	ID                 uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
 	ProductID          uuid.UUID      `gorm:"type:uuid;unique;not null;index" json:"productId"`
 	SKU                string         `gorm:"type:varchar(100);not null" json:"sku"`
 	QuantityAvailable  int            `gorm:"not null;default:0" json:"quantityAvailable"`
@@ -73,7 +73,7 @@ type Inventory struct {
 
 // InventoryTransaction represents an inventory change audit trail
 type InventoryTransaction struct {
-	ID              uuid.UUID      `gorm:"type:uuid;primary_key;default:uuid_generate_v4()" json:"id"`
+	ID              uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
 	InventoryID     uuid.UUID      `gorm:"type:uuid;not null;index" json:"inventoryId"`
 	TransactionType string         `gorm:"type:varchar(20);not null" json:"transactionType"`
 	Quantity        int            `gorm:"not null" json:"quantity"`

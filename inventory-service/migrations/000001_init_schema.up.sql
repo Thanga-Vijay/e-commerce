@@ -3,7 +3,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Create warehouses table
 CREATE TABLE IF NOT EXISTS warehouses (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
     code VARCHAR(50) UNIQUE NOT NULL,
     address JSONB NOT NULL,
@@ -20,7 +20,7 @@ CREATE INDEX IF NOT EXISTS idx_warehouses_deleted_at ON warehouses(deleted_at);
 
 -- Create inventory table
 CREATE TABLE IF NOT EXISTS inventory (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     product_id UUID UNIQUE NOT NULL,
     sku VARCHAR(100) NOT NULL,
     quantity_available INT NOT NULL DEFAULT 0,
@@ -40,7 +40,7 @@ CREATE INDEX IF NOT EXISTS idx_inventory_deleted_at ON inventory(deleted_at);
 
 -- Create inventory_transactions table
 CREATE TABLE IF NOT EXISTS inventory_transactions (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     inventory_id UUID NOT NULL REFERENCES inventory(id) ON DELETE CASCADE,
     transaction_type VARCHAR(20) NOT NULL,
     quantity INT NOT NULL,

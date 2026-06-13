@@ -48,7 +48,7 @@ func (a Address) Value() (driver.Value, error) {
 
 // Order represents a customer order
 type Order struct {
-	ID              uuid.UUID       `gorm:"type:uuid;primary_key;default:uuid_generate_v4()" json:"id"`
+	ID              uuid.UUID       `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
 	UserID          uuid.UUID       `gorm:"type:uuid;not null;index" json:"userId"`
 	OrderNumber     string          `gorm:"type:varchar(50);unique;not null;index" json:"orderNumber"`
 	Status          string          `gorm:"type:varchar(20);not null;index" json:"status"`
@@ -67,7 +67,7 @@ type Order struct {
 
 // OrderItem represents an item in an order
 type OrderItem struct {
-	ID           uuid.UUID      `gorm:"type:uuid;primary_key;default:uuid_generate_v4()" json:"id"`
+	ID           uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
 	OrderID      uuid.UUID      `gorm:"type:uuid;not null;index" json:"orderId"`
 	ProductID    uuid.UUID      `gorm:"type:uuid;not null" json:"productId"`
 	ProductName  string         `gorm:"type:varchar(255);not null" json:"productName"`
@@ -80,7 +80,7 @@ type OrderItem struct {
 
 // OrderStatus represents order status history
 type OrderStatus struct {
-	ID        uuid.UUID `gorm:"type:uuid;primary_key;default:uuid_generate_v4()" json:"id"`
+	ID        uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
 	OrderID   uuid.UUID `gorm:"type:uuid;not null;index" json:"orderId"`
 	Status    string    `gorm:"type:varchar(20);not null" json:"status"`
 	Comment   string    `gorm:"type:text" json:"comment,omitempty"`

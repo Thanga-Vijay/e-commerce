@@ -3,7 +3,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Create orders table
 CREATE TABLE IF NOT EXISTS orders (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL,
     order_number VARCHAR(50) UNIQUE NOT NULL,
     status VARCHAR(20) NOT NULL,
@@ -26,7 +26,7 @@ CREATE INDEX IF NOT EXISTS idx_orders_deleted_at ON orders(deleted_at);
 
 -- Create order_items table
 CREATE TABLE IF NOT EXISTS order_items (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
     product_id UUID NOT NULL,
     product_name VARCHAR(255) NOT NULL,
@@ -43,7 +43,7 @@ CREATE INDEX IF NOT EXISTS idx_order_items_deleted_at ON order_items(deleted_at)
 
 -- Create order_status_history table
 CREATE TABLE IF NOT EXISTS order_status_history (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
     status VARCHAR(20) NOT NULL,
     comment TEXT,

@@ -24,7 +24,7 @@ const (
 
 // Payment represents a payment transaction
 type Payment struct {
-	ID                     uuid.UUID      `gorm:"type:uuid;primary_key;default:uuid_generate_v4()" json:"id"`
+	ID                     uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
 	OrderID                uuid.UUID      `gorm:"type:uuid;unique;not null;index" json:"orderId"`
 	UserID                 uuid.UUID      `gorm:"type:uuid;not null;index" json:"userId"`
 	StripePaymentIntentID  string         `gorm:"type:varchar(255);unique" json:"stripePaymentIntentId,omitempty"`
@@ -41,7 +41,7 @@ type Payment struct {
 
 // Refund represents a payment refund
 type Refund struct {
-	ID              uuid.UUID      `gorm:"type:uuid;primary_key;default:uuid_generate_v4()" json:"id"`
+	ID              uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
 	PaymentID       uuid.UUID      `gorm:"type:uuid;not null;index" json:"paymentId"`
 	StripeRefundID  string         `gorm:"type:varchar(255);unique" json:"stripeRefundId,omitempty"`
 	Amount          float64        `gorm:"type:decimal(10,2);not null" json:"amount"`

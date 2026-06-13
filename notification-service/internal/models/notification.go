@@ -35,7 +35,7 @@ const (
 
 // Notification represents a notification record
 type Notification struct {
-	ID           uuid.UUID      `gorm:"type:uuid;primary_key;default:uuid_generate_v4()" json:"id"`
+	ID           uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
 	UserID       *uuid.UUID     `gorm:"type:uuid;index" json:"userId,omitempty"`
 	Type         string         `gorm:"type:varchar(50);not null" json:"type"`
 	Template     string         `gorm:"type:varchar(100);not null" json:"template"`
