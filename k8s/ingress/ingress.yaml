@@ -4,10 +4,10 @@ metadata:
   name: ecommerce-ingress
   namespace: ecommerce
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    #nginx.ingress.kubernetes.io/rewrite-target: /
+    #nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    #nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    #cert-manager.io/cluster-issuer: "letsencrypt-prod"
     nginx.ingress.kubernetes.io/rate-limit: "100"
     nginx.ingress.kubernetes.io/proxy-body-size: "10m"
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
@@ -17,12 +17,12 @@ spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - ecommerce.yourdomain.com
-    - api.ecommerce.yourdomain.com
+    - ecommerce.local
+    - api.ecommerce.local
     secretName: ecommerce-tls
   rules:
   # Frontend
-  - host: ecommerce.yourdomain.com
+  - host: ecommerce.local
     http:
       paths:
       - path: /
@@ -34,7 +34,7 @@ spec:
               number: 80
   
   # API Gateway / Backend Services
-  - host: api.ecommerce.yourdomain.com
+  - host: api.ecommerce.local
     http:
       paths:
       # Auth Service

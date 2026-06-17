@@ -104,7 +104,7 @@ if [ "$(docker ps -q -f name=kind-registry)" ]; then
     echo -e "${GREEN}✓ Registry already running${NC}"
 else
     docker run -d --restart=always \
-      -p 5000:5000 \
+      -p 5001:5000 \
       --name kind-registry \
       registry:2
 

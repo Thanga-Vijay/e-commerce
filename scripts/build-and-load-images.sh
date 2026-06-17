@@ -48,8 +48,8 @@ for service in "${SERVICES[@]}"; do
     
     # Build the image
     docker build -t ecommerce/${service}:${VERSION} \
-        -f services/${service}/Dockerfile \
-        services/${service}
+        -f ${service}/Dockerfile \
+        ${service}
     
     # Tag for local registry
     docker tag ecommerce/${service}:${VERSION} ${REGISTRY}/ecommerce/${service}:${VERSION}
@@ -90,7 +90,7 @@ echo -e "${GREEN}╚════════════════════
 echo ""
 echo -e "${YELLOW}Next steps:${NC}"
 echo "  1. Deploy to cluster: cd k8s && ./deploy.sh"
-echo "  2. Check pods: kubectl get pods -n ecommerce"
+echo "  2. Check pods: kubectl get pods -n e-commerce"
 echo ""
 echo -e "${BLUE}Available images:${NC}"
 for service in "${SERVICES[@]}"; do

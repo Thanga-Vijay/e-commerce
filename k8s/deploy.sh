@@ -32,57 +32,57 @@ echo ""
 
 # 1. Create namespace
 echo -e "${BLUE}1. Creating namespace...${RESET}"
-kubectl apply -f k8s/namespace.yaml
+kubectl apply -f namespace.yaml
 echo ""
 
 # 2. Create ConfigMaps and Secrets
 echo -e "${BLUE}2. Creating ConfigMaps and Secrets...${RESET}"
 echo -e "${YELLOW}⚠ Remember to update secrets.yaml with your actual credentials!${RESET}"
-kubectl apply -f k8s/configmap.yaml
-kubectl apply -f k8s/secrets.yaml
+kubectl apply -f configmap.yaml
+kubectl apply -f secrets.yaml
 echo ""
 
 # 3. Deploy databases
 echo -e "${BLUE}3. Deploying PostgreSQL databases...${RESET}"
-kubectl apply -f k8s/databases/
+kubectl apply -f databases/
 echo "Waiting for databases to be ready..."
 kubectl wait --for=condition=ready pod -l app=auth-db -n $NAMESPACE --timeout=300s || true
 echo ""
 
 # 4. Deploy Redis
 echo -e "${BLUE}4. Deploying Redis...${RESET}"
-kubectl apply -f k8s/redis/
+kubectl apply -f redis/
 echo "Waiting for Redis to be ready..."
 kubectl wait --for=condition=ready pod -l app=redis -n $NAMESPACE --timeout=120s || true
 echo ""
 
 # 5. Deploy Kafka
 echo -e "${BLUE}5. Deploying Kafka and Zookeeper...${RESET}"
-kubectl apply -f k8s/kafka/
+kubectl apply -f kafka/
 echo "Waiting for Kafka to be ready..."
 sleep 30
 echo ""
 
 # 6. Deploy microservices
 echo -e "${BLUE}6. Deploying microservices...${RESET}"
-kubectl apply -f k8s/services/
+kubectl apply -f services/
 echo "Waiting for services to be ready..."
 kubectl wait --for=condition=ready pod -l app=auth-service -n $NAMESPACE --timeout=180s || true
 echo ""
 
 # 7. Deploy frontend
 echo -e "${BLUE}7. Deploying frontend...${RESET}"
-kubectl apply -f k8s/frontend/
+kubectl apply -f frontend/
 echo ""
 
 # 8. Deploy Ingress
 echo -e "${BLUE}8. Deploying Ingress...${RESET}"
-kubectl apply -f k8s/ingress/
+kubectl apply -f ingress/
 echo ""
 
 # 9. Deploy HPA
 echo -e "${BLUE}9. Deploying Horizontal Pod Autoscalers...${RESET}"
-kubectl apply -f k8s/hpa/
+kubectl apply -f hpa/
 echo ""
 
 # Display status
