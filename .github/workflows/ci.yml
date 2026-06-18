@@ -61,6 +61,7 @@ jobs:
               - 'frontend/**'
             k8s:
               - 'k8s/**'
+            workflows:
               - '.github/workflows/**'
             any_service:
               - 'auth-service/**'
@@ -78,7 +79,7 @@ jobs:
     name: Test Auth Service
     runs-on: ubuntu-latest
     needs: detect-changes
-    if: needs.detect-changes.outputs.auth == 'true' || needs.detect-changes.outputs.k8s == 'true'
+    if: needs.detect-changes.outputs.auth == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -94,15 +95,7 @@ jobs:
 
       - name: Run tests
         working-directory: auth-service
-        run: |
-          go test -v -coverprofile=coverage.out ./...
-          go test -race ./...
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./auth-service/coverage.out
-          flags: auth-service
+        run: go test -v -race ./...
 
       - name: Build Docker image
         uses: docker/build-push-action@v5
@@ -119,7 +112,7 @@ jobs:
     name: Test Product Service
     runs-on: ubuntu-latest
     needs: detect-changes
-    if: needs.detect-changes.outputs.product == 'true' || needs.detect-changes.outputs.k8s == 'true'
+    if: needs.detect-changes.outputs.product == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -135,15 +128,7 @@ jobs:
 
       - name: Run tests
         working-directory: product-service
-        run: |
-          go test -v -coverprofile=coverage.out ./...
-          go test -race ./...
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./product-service/coverage.out
-          flags: product-service
+        run: go test -v -race ./...
 
       - name: Build Docker image
         uses: docker/build-push-action@v5
@@ -160,7 +145,7 @@ jobs:
     name: Test Cart Service
     runs-on: ubuntu-latest
     needs: detect-changes
-    if: needs.detect-changes.outputs.cart == 'true' || needs.detect-changes.outputs.k8s == 'true'
+    if: needs.detect-changes.outputs.cart == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -176,15 +161,7 @@ jobs:
 
       - name: Run tests
         working-directory: cart-service
-        run: |
-          go test -v -coverprofile=coverage.out ./...
-          go test -race ./...
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./cart-service/coverage.out
-          flags: cart-service
+        run: go test -v -race ./...
 
       - name: Build Docker image
         uses: docker/build-push-action@v5
@@ -201,7 +178,7 @@ jobs:
     name: Test Wishlist Service
     runs-on: ubuntu-latest
     needs: detect-changes
-    if: needs.detect-changes.outputs.wishlist == 'true' || needs.detect-changes.outputs.k8s == 'true'
+    if: needs.detect-changes.outputs.wishlist == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -217,15 +194,7 @@ jobs:
 
       - name: Run tests
         working-directory: wishlist-service
-        run: |
-          go test -v -coverprofile=coverage.out ./...
-          go test -race ./...
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./wishlist-service/coverage.out
-          flags: wishlist-service
+        run: go test -v -race ./...
 
       - name: Build Docker image
         uses: docker/build-push-action@v5
@@ -242,7 +211,7 @@ jobs:
     name: Test Order Service
     runs-on: ubuntu-latest
     needs: detect-changes
-    if: needs.detect-changes.outputs.order == 'true' || needs.detect-changes.outputs.k8s == 'true'
+    if: needs.detect-changes.outputs.order == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -258,15 +227,7 @@ jobs:
 
       - name: Run tests
         working-directory: order-service
-        run: |
-          go test -v -coverprofile=coverage.out ./...
-          go test -race ./...
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./order-service/coverage.out
-          flags: order-service
+        run: go test -v -race ./...
 
       - name: Build Docker image
         uses: docker/build-push-action@v5
@@ -283,7 +244,7 @@ jobs:
     name: Test Payment Service
     runs-on: ubuntu-latest
     needs: detect-changes
-    if: needs.detect-changes.outputs.payment == 'true' || needs.detect-changes.outputs.k8s == 'true'
+    if: needs.detect-changes.outputs.payment == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -299,15 +260,7 @@ jobs:
 
       - name: Run tests
         working-directory: payment-service
-        run: |
-          go test -v -coverprofile=coverage.out ./...
-          go test -race ./...
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./payment-service/coverage.out
-          flags: payment-service
+        run: go test -v -race ./...
 
       - name: Build Docker image
         uses: docker/build-push-action@v5
@@ -324,7 +277,7 @@ jobs:
     name: Test Inventory Service
     runs-on: ubuntu-latest
     needs: detect-changes
-    if: needs.detect-changes.outputs.inventory == 'true' || needs.detect-changes.outputs.k8s == 'true'
+    if: needs.detect-changes.outputs.inventory == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -340,15 +293,7 @@ jobs:
 
       - name: Run tests
         working-directory: inventory-service
-        run: |
-          go test -v -coverprofile=coverage.out ./...
-          go test -race ./...
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./inventory-service/coverage.out
-          flags: inventory-service
+        run: go test -v -race ./...
 
       - name: Build Docker image
         uses: docker/build-push-action@v5
@@ -365,7 +310,7 @@ jobs:
     name: Test Notification Service
     runs-on: ubuntu-latest
     needs: detect-changes
-    if: needs.detect-changes.outputs.notification == 'true' || needs.detect-changes.outputs.k8s == 'true'
+    if: needs.detect-changes.outputs.notification == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -381,15 +326,7 @@ jobs:
 
       - name: Run tests
         working-directory: notification-service
-        run: |
-          go test -v -coverprofile=coverage.out ./...
-          go test -race ./...
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./notification-service/coverage.out
-          flags: notification-service
+        run: go test -v -race ./...
 
       - name: Build Docker image
         uses: docker/build-push-action@v5
@@ -406,7 +343,7 @@ jobs:
     name: Test Reporting Service
     runs-on: ubuntu-latest
     needs: detect-changes
-    if: needs.detect-changes.outputs.reporting == 'true' || needs.detect-changes.outputs.k8s == 'true'
+    if: needs.detect-changes.outputs.reporting == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -422,15 +359,7 @@ jobs:
 
       - name: Run tests
         working-directory: reporting-service
-        run: |
-          go test -v -coverprofile=coverage.out ./...
-          go test -race ./...
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./reporting-service/coverage.out
-          flags: reporting-service
+        run: go test -v -race ./...
 
       - name: Build Docker image
         uses: docker/build-push-action@v5
@@ -447,7 +376,7 @@ jobs:
     name: Test Frontend
     runs-on: ubuntu-latest
     needs: detect-changes
-    if: needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.k8s == 'true'
+    if: needs.detect-changes.outputs.frontend == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
