@@ -409,9 +409,18 @@ jobs:
 
       - name: Validate manifests
         run: |
-          for file in k8s/**/*.yaml; do
+          find k8s -name '*.yaml' -type f | while read file; do
             echo "Validating $file"
             kubectl apply --dry-run=client -f "$file" || exit 1
+          done
+
+      - name: Run kubeval
+        run: |
+          wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
+          tar xf kubeval-linux-amd64.tar.gz
+          find k8s -name '*.yaml' -type f | while read file; do
+            echo "Running kubeval on $file"
+            ./kubeval "$file" || exit 1
           done
 
   # Summary job - always runs to check overall status
@@ -438,11 +447,3 @@ jobs:
             exit 1
           fi
           echo "CI passed successfully!"
-
-      - name: Run kubeval
-        run: |
-          wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
-          tar xf kubeval-linux-amd64.tar.gz
-          for file in k8s/**/*.yaml; do
-            ./kubeval "$file" || exit 1
-          done
