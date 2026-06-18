@@ -7,7 +7,7 @@ on:
     branches: [develop]
 
 env:
-  GO_VERSION: '1.21'
+  GO_VERSION: '1.22'
   NODE_VERSION: '18'
 
 jobs:
@@ -94,7 +94,9 @@ jobs:
 
       - name: Run tests
         working-directory: auth-service
-        run: go test -v -race -coverprofile=coverage.out ./...
+        run: |
+          go test -v -coverprofile=coverage.out ./...
+          go test -race ./...
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
@@ -133,7 +135,9 @@ jobs:
 
       - name: Run tests
         working-directory: product-service
-        run: go test -v -race -coverprofile=coverage.out ./...
+        run: |
+          go test -v -coverprofile=coverage.out ./...
+          go test -race ./...
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
@@ -172,7 +176,9 @@ jobs:
 
       - name: Run tests
         working-directory: cart-service
-        run: go test -v -race -coverprofile=coverage.out ./...
+        run: |
+          go test -v -coverprofile=coverage.out ./...
+          go test -race ./...
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
@@ -211,7 +217,9 @@ jobs:
 
       - name: Run tests
         working-directory: wishlist-service
-        run: go test -v -race -coverprofile=coverage.out ./...
+        run: |
+          go test -v -coverprofile=coverage.out ./...
+          go test -race ./...
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
@@ -250,7 +258,9 @@ jobs:
 
       - name: Run tests
         working-directory: order-service
-        run: go test -v -race -coverprofile=coverage.out ./...
+        run: |
+          go test -v -coverprofile=coverage.out ./...
+          go test -race ./...
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
@@ -289,7 +299,9 @@ jobs:
 
       - name: Run tests
         working-directory: payment-service
-        run: go test -v -race -coverprofile=coverage.out ./...
+        run: |
+          go test -v -coverprofile=coverage.out ./...
+          go test -race ./...
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
@@ -328,7 +340,9 @@ jobs:
 
       - name: Run tests
         working-directory: inventory-service
-        run: go test -v -race -coverprofile=coverage.out ./...
+        run: |
+          go test -v -coverprofile=coverage.out ./...
+          go test -race ./...
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
@@ -367,7 +381,9 @@ jobs:
 
       - name: Run tests
         working-directory: notification-service
-        run: go test -v -race -coverprofile=coverage.out ./...
+        run: |
+          go test -v -coverprofile=coverage.out ./...
+          go test -race ./...
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
@@ -406,7 +422,9 @@ jobs:
 
       - name: Run tests
         working-directory: reporting-service
-        run: go test -v -race -coverprofile=coverage.out ./...
+        run: |
+          go test -v -coverprofile=coverage.out ./...
+          go test -race ./...
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
