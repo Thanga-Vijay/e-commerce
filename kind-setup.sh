@@ -111,7 +111,7 @@ else
     # Connect registry to KIND network
     docker network connect kind kind-registry || true
     
-    echo -e "${GREEN}✓ Local registry created at localhost:5000${NC}"
+    echo -e "${GREEN}✓ Local registry created at localhost:5001${NC}"
 fi
 
 # Label nodes for different workloads
@@ -150,7 +150,7 @@ echo -e "${GREEN}Cluster Information:${NC}"
 echo "  Name: ecommerce-local"
 echo "  Nodes: 4 (1 control-plane, 3 workers)"
 echo "  Context: kind-ecommerce-local"
-echo "  Registry: localhost:5000"
+echo "  Registry: localhost:5001"
 echo ""
 echo -e "${GREEN}Access Points:${NC}"
 echo "  Ingress HTTP: http://localhost:80"

@@ -13,7 +13,7 @@ BLUE='\033[0;36m'
 NC='\033[0m'
 
 CLUSTER_NAME="ecommerce-local"
-REGISTRY="localhost:5000"
+REGISTRY="localhost:5001"
 VERSION="${VERSION:-latest}"
 
 echo -e "${BLUE}╔════════════════════════════════════════════════════════╗${NC}"
