@@ -104,8 +104,6 @@ jobs:
           file: auth-service/Dockerfile
           push: false
           tags: ecommerce/auth-service:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
   # Test Product Service
   test-product:
@@ -137,8 +135,6 @@ jobs:
           file: product-service/Dockerfile
           push: false
           tags: ecommerce/product-service:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
   # Test Cart Service
   test-cart:
@@ -170,8 +166,6 @@ jobs:
           file: cart-service/Dockerfile
           push: false
           tags: ecommerce/cart-service:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
   # Test Wishlist Service
   test-wishlist:
@@ -203,8 +197,6 @@ jobs:
           file: wishlist-service/Dockerfile
           push: false
           tags: ecommerce/wishlist-service:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
   # Test Order Service
   test-order:
@@ -236,8 +228,6 @@ jobs:
           file: order-service/Dockerfile
           push: false
           tags: ecommerce/order-service:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
   # Test Payment Service
   test-payment:
@@ -269,8 +259,6 @@ jobs:
           file: payment-service/Dockerfile
           push: false
           tags: ecommerce/payment-service:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
   # Test Inventory Service
   test-inventory:
@@ -302,8 +290,6 @@ jobs:
           file: inventory-service/Dockerfile
           push: false
           tags: ecommerce/inventory-service:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
   # Test Notification Service
   test-notification:
@@ -335,8 +321,6 @@ jobs:
           file: notification-service/Dockerfile
           push: false
           tags: ecommerce/notification-service:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
   # Test Reporting Service
   test-reporting:
@@ -368,8 +352,6 @@ jobs:
           file: reporting-service/Dockerfile
           push: false
           tags: ecommerce/reporting-service:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
   # Test Frontend
   test-frontend:
@@ -411,8 +393,6 @@ jobs:
           file: frontend/Dockerfile
           push: false
           tags: ecommerce/frontend:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
   # Validate Kubernetes Manifests
   validate-kubernetes:
