@@ -95,3 +95,4 @@ auth-service/
 - `SMTP_PASSWORD` - Email password
 
 Test
+Test2
