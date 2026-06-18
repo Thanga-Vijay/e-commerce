@@ -16,6 +16,7 @@ const Products = () => {
 
   useEffect(() => {
     fetchProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, search, category]);
 
   useEffect(() => {
