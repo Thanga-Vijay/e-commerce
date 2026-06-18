@@ -1,202 +1,242 @@
-name: CD - Deploy to Kubernetes
+name: CD - Deploy to EKS
 
 on:
-  push:
+  workflow_run:
+    workflows: ["CI - Build and Test"]
+    types:
+      - completed
     branches: [main]
+  push:
     tags:
       - 'v*.*.*'
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_PREFIX: ${{ github.repository_owner }}/ecommerce
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+  IMAGE_PREFIX: ecommerce
 
 jobs:
-  build-and-push:
-    name: Build and Push Images
+  # Check if CI succeeded
+  check-ci:
+    name: Check CI Success
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_run'
+    steps:
+      - name: Check CI status
+        if: ${{ github.event.workflow_run.conclusion != 'success' }}
+        run: |
+          echo "CI workflow failed. Skipping deployment."
+          exit 1
+
+  # Detect which services changed
+  detect-changes:
+    name: Detect Changed Services
+    runs-on: ubuntu-latest
+    needs: [check-ci]
+    if: always() && (needs.check-ci.result == 'success' || github.event_name == 'push')
+    outputs:
+      services: ${{ steps.changes.outputs.services }}
+      frontend: ${{ steps.changes.outputs.frontend }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed services
+        id: changes
+        run: |
+          # Get list of changed files
+          if [ "${{ github.event_name }}" == "workflow_run" ]; then
+            CHANGED_FILES=$(git diff --name-only ${{ github.event.workflow_run.head_sha }}^ ${{ github.event.workflow_run.head_sha }})
+          else
+            CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)
+          fi
+          
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+          
+          # Detect changed services
+          SERVICES=""
+          for service in auth product cart wishlist order payment inventory notification reporting; do
+            if echo "$CHANGED_FILES" | grep -q "^${service}-service/"; then
+              SERVICES="$SERVICES $service"
+            fi
+          done
+          
+          # Check if frontend changed
+          FRONTEND="false"
+          if echo "$CHANGED_FILES" | grep -q "^frontend/"; then
+            FRONTEND="true"
+          fi
+          
+          # If k8s or workflows changed, deploy all
+          if echo "$CHANGED_FILES" | grep -qE "^(k8s/|.github/workflows/)"; then
+            SERVICES="auth product cart wishlist order payment inventory notification reporting"
+            FRONTEND="true"
+          fi
+          
+          # Remove leading space and convert to JSON array
+          SERVICES=$(echo "$SERVICES" | xargs | sed 's/ /", "/g')
+          if [ ! -z "$SERVICES" ]; then
+            SERVICES="[\"$SERVICES\"]"
+          else
+            SERVICES="[]"
+          fi
+          
+          echo "services=$SERVICES" >> $GITHUB_OUTPUT
+          echo "frontend=$FRONTEND" >> $GITHUB_OUTPUT
+          
+          echo "Services to deploy: $SERVICES"
+          echo "Frontend to deploy: $FRONTEND"
+
+  # Build and push to ECR
+  build-and-push:
+    name: Build and Push to ECR
+    runs-on: ubuntu-latest
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.services != '[]' || needs.detect-changes.outputs.frontend == 'true'
     permissions:
+      id-token: write
       contents: read
-      packages: write
     strategy:
       matrix:
-        service: [auth, product, cart, wishlist, order, payment, inventory, notification, reporting, frontend]
+        service: [auth, product, cart, wishlist, order, payment, inventory, notification, reporting]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Log in to Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check if service needs build
+        id: check
+        run: |
+          SERVICES='${{ needs.detect-changes.outputs.services }}'
+          if echo "$SERVICES" | grep -q "${{ matrix.service }}"; then
+            echo "build=true" >> $GITHUB_OUTPUT
+          else
+            echo "build=false" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
+      - name: Configure AWS credentials
+        if: steps.check.outputs.build == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service }}-service
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        if: steps.check.outputs.build == 'true'
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        if: steps.check.outputs.build == 'true'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        if: steps.check.outputs.build == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.service }}-service
+          file: ${{ matrix.service }}-service/Dockerfile
+          push: true
           tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
+            ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service }}-service:${{ github.sha }}
+            ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service }}-service:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # Build and push frontend
+  build-frontend:
+    name: Build and Push Frontend
+    runs-on: ubuntu-latest
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.frontend == 'true'
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push
+      - name: Build and push frontend
         uses: docker/build-push-action@v5
         with:
-          context: ${{ matrix.service == 'frontend' && 'frontend' || format('services/{0}', matrix.service) }}
-          file: ${{ matrix.service == 'frontend' && 'frontend/Dockerfile' || format('services/{0}/Dockerfile', matrix.service) }}
+          context: frontend
+          file: frontend/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: |
+            ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:${{ github.sha }}
+            ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  deploy-staging:
-    name: Deploy to Staging
+  # Update manifests for ArgoCD
+  update-manifests:
+    name: Update K8s Manifests
     runs-on: ubuntu-latest
-    needs: build-and-push
-    environment:
-      name: staging
-      url: https://staging.ecommerce.yourdomain.com
+    needs: [build-and-push, build-frontend, detect-changes]
+    if: always() && (needs.build-and-push.result == 'success' || needs.build-frontend.result == 'success')
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
-
-      - name: Configure kubectl
-        run: |
-          echo "${{ secrets.KUBECONFIG_STAGING }}" > kubeconfig
-          export KUBECONFIG=kubeconfig
-
-      - name: Deploy to staging
-        run: |
-          # Update image tags in manifests
-          export IMAGE_TAG=${{ github.sha }}
-          cd k8s
-          
-          # Apply all manifests
-          kubectl apply -f namespace.yaml
-          kubectl apply -f configmap.yaml
-          kubectl apply -f secrets.yaml
-          kubectl apply -f databases/
-          kubectl apply -f redis/
-          kubectl apply -f kafka/
-          
-          # Update service images with new tag
-          for service in auth product cart wishlist order payment inventory notification reporting; do
-            kubectl set image deployment/${service}-service \
-              ${service}-service=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${service}-service:${{ github.sha }} \
-              -n ecommerce
-          done
-          
-          kubectl set image deployment/frontend \
-            frontend=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend-service:${{ github.sha }} \
-            -n ecommerce
-          
-          kubectl apply -f services/
-          kubectl apply -f frontend/
-          kubectl apply -f ingress/
-          kubectl apply -f hpa/
-
-      - name: Wait for rollout
-        run: |
-          kubectl rollout status deployment/auth-service -n ecommerce --timeout=5m
-          kubectl rollout status deployment/product-service -n ecommerce --timeout=5m
-          kubectl rollout status deployment/frontend -n ecommerce --timeout=5m
-
-      - name: Run smoke tests
-        run: |
-          echo "Running smoke tests..."
-          # Add smoke test commands here
-
-  deploy-production:
-    name: Deploy to Production
-    runs-on: ubuntu-latest
-    needs: deploy-staging
-    if: startsWith(github.ref, 'refs/tags/v')
-    environment:
-      name: production
-      url: https://ecommerce.yourdomain.com
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
-
-      - name: Configure kubectl
-        run: |
-          echo "${{ secrets.KUBECONFIG_PRODUCTION }}" > kubeconfig
-          export KUBECONFIG=kubeconfig
-
-      - name: Deploy to production
-        run: |
-          export IMAGE_TAG=${{ github.ref_name }}
-          cd k8s
-          
-          # Apply manifests with production configs
-          kubectl apply -f namespace.yaml
-          kubectl apply -f configmap.yaml
-          kubectl apply -f secrets.yaml
-          
-          # Database deployments (if needed)
-          kubectl apply -f databases/
-          kubectl apply -f redis/
-          kubectl apply -f kafka/
-          
-          # Update service images
-          for service in auth product cart wishlist order payment inventory notification reporting; do
-            kubectl set image deployment/${service}-service \
-              ${service}-service=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${service}-service:${{ github.ref_name }} \
-              -n ecommerce
-          done
-          
-          kubectl set image deployment/frontend \
-            frontend=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend-service:${{ github.ref_name }} \
-            -n ecommerce
-          
-          kubectl apply -f services/
-          kubectl apply -f frontend/
-          kubectl apply -f ingress/
-          kubectl apply -f hpa/
-
-      - name: Wait for rollout
-        run: |
-          for deployment in auth-service product-service cart-service order-service payment-service frontend; do
-            kubectl rollout status deployment/${deployment} -n ecommerce --timeout=10m
-          done
-
-      - name: Run health checks
-        run: |
-          echo "Running production health checks..."
-          # Add health check commands
-
-      - name: Notify deployment
-        uses: 8398a7/action-slack@v3
         with:
-          status: ${{ job.status }}
-          text: 'Production deployment ${{ github.ref_name }} completed!'
-          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
-        if: always()
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-  rollback:
-    name: Rollback on Failure
-    runs-on: ubuntu-latest
-    needs: deploy-production
-    if: failure()
-    steps:
-      - name: Rollback deployment
+      - name: Update service images
         run: |
-          echo "Rolling back production deployment..."
-          kubectl rollout undo deployment/auth-service -n ecommerce
-          kubectl rollout undo deployment/product-service -n ecommerce
-          kubectl rollout undo deployment/frontend -n ecommerce
+          SERVICES='${{ needs.detect-changes.outputs.services }}'
+          
+          # Update backend services
+          for service in auth product cart wishlist order payment inventory notification reporting; do
+            if echo "$SERVICES" | grep -q "$service"; then
+              echo "Updating $service-service image tag"
+              sed -i "s|image: .*/${service}-service:.*|image: ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_PREFIX }}/${service}-service:${{ github.sha }}|g" \
+                k8s/services/${service}-service.yaml
+            fi
+          done
+          
+          # Update frontend
+          if [ "${{ needs.detect-changes.outputs.frontend }}" == "true" ]; then
+            echo "Updating frontend image tag"
+            sed -i "s|image: .*/frontend:.*|image: ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:${{ github.sha }}|g" \
+              k8s/frontend/frontend.yaml
+          fi
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add k8s/
+          git commit -m "Update image tags to ${{ github.sha }}" || echo "No changes to commit"
+          git push
+
+  # Notify deployment (ArgoCD will handle actual deployment)
+  notify:
+    name: Notify Deployment
+    runs-on: ubuntu-latest
+    needs: [update-manifests]
+    if: always()
+    steps:
+      - name: Deployment notification
+        run: |
+          echo "✅ Images pushed to ECR"
+          echo "✅ Manifests updated in Git"
+          echo "⏳ ArgoCD will deploy automatically"
+          echo ""
+          echo "Monitor deployment at:"
+          echo "https://argocd.yourdomain.com"
