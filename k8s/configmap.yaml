@@ -41,4 +41,14 @@ data:
   # Application Configuration
   GIN_MODE: "release"
   LOG_LEVEL: "info"
-  ENVIRONMENT: "production"
+  ENVIRONMENT: "local"
+  
+  # LocalStack / AWS Configuration
+  AWS_ENDPOINT_URL: "http://localstack.localstack.svc.cluster.local:4566"
+  AWS_REGION: "us-east-1"
+  AWS_ACCESS_KEY_ID: "test"
+  AWS_SECRET_ACCESS_KEY: "test"
+  S3_BUCKET_IMAGES: "ecommerce-images"
+  S3_BUCKET_BACKUPS: "ecommerce-backups"
+  S3_BUCKET_LOGS: "ecommerce-logs"
+  USE_LOCALSTACK: "true"
