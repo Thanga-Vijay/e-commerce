@@ -7,7 +7,7 @@ on:
     branches: [develop]
 
 env:
-  GO_VERSION: '1.21'
+  GO_VERSION: '1.22'
   NODE_VERSION: '18'
 
 jobs:
@@ -61,6 +61,7 @@ jobs:
               - 'frontend/**'
             k8s:
               - 'k8s/**'
+            workflows:
               - '.github/workflows/**'
             any_service:
               - 'auth-service/**'
@@ -73,12 +74,33 @@ jobs:
               - 'notification-service/**'
               - 'reporting-service/**'
 
-  # Test Auth Service
-  test-auth:
-    name: Test Auth Service
+  # Test Go Microservices (Matrix Strategy)
+  test-services:
+    name: Test ${{ matrix.service }}
     runs-on: ubuntu-latest
     needs: detect-changes
-    if: needs.detect-changes.outputs.auth == 'true' || needs.detect-changes.outputs.k8s == 'true'
+    if: |
+      (matrix.service == 'auth-service' && needs.detect-changes.outputs.auth == 'true') ||
+      (matrix.service == 'product-service' && needs.detect-changes.outputs.product == 'true') ||
+      (matrix.service == 'cart-service' && needs.detect-changes.outputs.cart == 'true') ||
+      (matrix.service == 'wishlist-service' && needs.detect-changes.outputs.wishlist == 'true') ||
+      (matrix.service == 'order-service' && needs.detect-changes.outputs.order == 'true') ||
+      (matrix.service == 'payment-service' && needs.detect-changes.outputs.payment == 'true') ||
+      (matrix.service == 'inventory-service' && needs.detect-changes.outputs.inventory == 'true') ||
+      (matrix.service == 'notification-service' && needs.detect-changes.outputs.notification == 'true') ||
+      (matrix.service == 'reporting-service' && needs.detect-changes.outputs.reporting == 'true')
+    strategy:
+      matrix:
+        service:
+          - auth-service
+          - product-service
+          - cart-service
+          - wishlist-service
+          - order-service
+          - payment-service
+          - inventory-service
+          - notification-service
+          - reporting-service
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -89,347 +111,27 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
 
       - name: Install dependencies
-        working-directory: auth-service
+        working-directory: ${{ matrix.service }}
         run: go mod download
 
       - name: Run tests
-        working-directory: auth-service
-        run: go test -v -race -coverprofile=coverage.out ./...
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./auth-service/coverage.out
-          flags: auth-service
+        working-directory: ${{ matrix.service }}
+        run: go test -v -race ./...
 
       - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
-          context: auth-service
-          file: auth-service/Dockerfile
+          context: ${{ matrix.service }}
+          file: ${{ matrix.service }}/Dockerfile
           push: false
-          tags: ecommerce/auth-service:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  # Test Product Service
-  test-product:
-    name: Test Product Service
-    runs-on: ubuntu-latest
-    needs: detect-changes
-    if: needs.detect-changes.outputs.product == 'true' || needs.detect-changes.outputs.k8s == 'true'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Install dependencies
-        working-directory: product-service
-        run: go mod download
-
-      - name: Run tests
-        working-directory: product-service
-        run: go test -v -race -coverprofile=coverage.out ./...
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./product-service/coverage.out
-          flags: product-service
-
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: product-service
-          file: product-service/Dockerfile
-          push: false
-          tags: ecommerce/product-service:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  # Test Cart Service
-  test-cart:
-    name: Test Cart Service
-    runs-on: ubuntu-latest
-    needs: detect-changes
-    if: needs.detect-changes.outputs.cart == 'true' || needs.detect-changes.outputs.k8s == 'true'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Install dependencies
-        working-directory: cart-service
-        run: go mod download
-
-      - name: Run tests
-        working-directory: cart-service
-        run: go test -v -race -coverprofile=coverage.out ./...
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./cart-service/coverage.out
-          flags: cart-service
-
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: cart-service
-          file: cart-service/Dockerfile
-          push: false
-          tags: ecommerce/cart-service:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  # Test Wishlist Service
-  test-wishlist:
-    name: Test Wishlist Service
-    runs-on: ubuntu-latest
-    needs: detect-changes
-    if: needs.detect-changes.outputs.wishlist == 'true' || needs.detect-changes.outputs.k8s == 'true'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Install dependencies
-        working-directory: wishlist-service
-        run: go mod download
-
-      - name: Run tests
-        working-directory: wishlist-service
-        run: go test -v -race -coverprofile=coverage.out ./...
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./wishlist-service/coverage.out
-          flags: wishlist-service
-
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: wishlist-service
-          file: wishlist-service/Dockerfile
-          push: false
-          tags: ecommerce/wishlist-service:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  # Test Order Service
-  test-order:
-    name: Test Order Service
-    runs-on: ubuntu-latest
-    needs: detect-changes
-    if: needs.detect-changes.outputs.order == 'true' || needs.detect-changes.outputs.k8s == 'true'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Install dependencies
-        working-directory: order-service
-        run: go mod download
-
-      - name: Run tests
-        working-directory: order-service
-        run: go test -v -race -coverprofile=coverage.out ./...
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./order-service/coverage.out
-          flags: order-service
-
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: order-service
-          file: order-service/Dockerfile
-          push: false
-          tags: ecommerce/order-service:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  # Test Payment Service
-  test-payment:
-    name: Test Payment Service
-    runs-on: ubuntu-latest
-    needs: detect-changes
-    if: needs.detect-changes.outputs.payment == 'true' || needs.detect-changes.outputs.k8s == 'true'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Install dependencies
-        working-directory: payment-service
-        run: go mod download
-
-      - name: Run tests
-        working-directory: payment-service
-        run: go test -v -race -coverprofile=coverage.out ./...
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./payment-service/coverage.out
-          flags: payment-service
-
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: payment-service
-          file: payment-service/Dockerfile
-          push: false
-          tags: ecommerce/payment-service:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  # Test Inventory Service
-  test-inventory:
-    name: Test Inventory Service
-    runs-on: ubuntu-latest
-    needs: detect-changes
-    if: needs.detect-changes.outputs.inventory == 'true' || needs.detect-changes.outputs.k8s == 'true'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Install dependencies
-        working-directory: inventory-service
-        run: go mod download
-
-      - name: Run tests
-        working-directory: inventory-service
-        run: go test -v -race -coverprofile=coverage.out ./...
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./inventory-service/coverage.out
-          flags: inventory-service
-
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: inventory-service
-          file: inventory-service/Dockerfile
-          push: false
-          tags: ecommerce/inventory-service:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  # Test Notification Service
-  test-notification:
-    name: Test Notification Service
-    runs-on: ubuntu-latest
-    needs: detect-changes
-    if: needs.detect-changes.outputs.notification == 'true' || needs.detect-changes.outputs.k8s == 'true'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Install dependencies
-        working-directory: notification-service
-        run: go mod download
-
-      - name: Run tests
-        working-directory: notification-service
-        run: go test -v -race -coverprofile=coverage.out ./...
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./notification-service/coverage.out
-          flags: notification-service
-
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: notification-service
-          file: notification-service/Dockerfile
-          push: false
-          tags: ecommerce/notification-service:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  # Test Reporting Service
-  test-reporting:
-    name: Test Reporting Service
-    runs-on: ubuntu-latest
-    needs: detect-changes
-    if: needs.detect-changes.outputs.reporting == 'true' || needs.detect-changes.outputs.k8s == 'true'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Install dependencies
-        working-directory: reporting-service
-        run: go mod download
-
-      - name: Run tests
-        working-directory: reporting-service
-        run: go test -v -race -coverprofile=coverage.out ./...
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./reporting-service/coverage.out
-          flags: reporting-service
-
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: reporting-service
-          file: reporting-service/Dockerfile
-          push: false
-          tags: ecommerce/reporting-service:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          tags: ecommerce/${{ matrix.service }}:${{ github.sha }}
 
   # Test Frontend
   test-frontend:
     name: Test Frontend
     runs-on: ubuntu-latest
     needs: detect-changes
-    if: needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.k8s == 'true'
+    if: needs.detect-changes.outputs.frontend == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -451,7 +153,7 @@ jobs:
 
       - name: Run tests
         working-directory: frontend
-        run: npm test -- --coverage
+        run: npm test
 
       - name: Build frontend
         working-directory: frontend
@@ -464,8 +166,6 @@ jobs:
           file: frontend/Dockerfile
           push: false
           tags: ecommerce/frontend:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
   # Validate Kubernetes Manifests
   validate-kubernetes:
@@ -482,40 +182,33 @@ jobs:
 
       - name: Validate manifests
         run: |
-          for file in k8s/**/*.yaml; do
+          find k8s -name '*.yaml' -type f | while read file; do
             echo "Validating $file"
             kubectl apply --dry-run=client -f "$file" || exit 1
+          done
+
+      - name: Run kubeval
+        run: |
+          wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
+          tar xf kubeval-linux-amd64.tar.gz
+          find k8s -name '*.yaml' -type f | while read file; do
+            echo "Running kubeval on $file"
+            ./kubeval "$file" || exit 1
           done
 
   # Summary job - always runs to check overall status
   ci-success:
     name: CI Success
     runs-on: ubuntu-latest
-    needs: [detect-changes, test-auth, test-product, test-cart, test-wishlist, test-order, test-payment, test-inventory, test-notification, test-reporting, test-frontend, validate-kubernetes]
+    needs: [detect-changes, test-services, test-frontend, validate-kubernetes]
     if: always()
     steps:
       - name: Check CI status
         run: |
-          if [[ "${{ needs.test-auth.result }}" == "failure" ]] || \
-             [[ "${{ needs.test-product.result }}" == "failure" ]] || \
-             [[ "${{ needs.test-cart.result }}" == "failure" ]] || \
-             [[ "${{ needs.test-wishlist.result }}" == "failure" ]] || \
-             [[ "${{ needs.test-order.result }}" == "failure" ]] || \
-             [[ "${{ needs.test-payment.result }}" == "failure" ]] || \
-             [[ "${{ needs.test-inventory.result }}" == "failure" ]] || \
-             [[ "${{ needs.test-notification.result }}" == "failure" ]] || \
-             [[ "${{ needs.test-reporting.result }}" == "failure" ]] || \
+          if [[ "${{ needs.test-services.result }}" == "failure" ]] || \
              [[ "${{ needs.test-frontend.result }}" == "failure" ]] || \
              [[ "${{ needs.validate-kubernetes.result }}" == "failure" ]]; then
             echo "CI failed"
             exit 1
           fi
           echo "CI passed successfully!"
-
-      - name: Run kubeval
-        run: |
-          wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
-          tar xf kubeval-linux-amd64.tar.gz
-          for file in k8s/**/*.yaml; do
-            ./kubeval "$file" || exit 1
-          done

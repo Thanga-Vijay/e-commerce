@@ -80,3 +80,5 @@ kubectl apply -f .
 cd infrastructure/monitoring
 ./setup-monitoring.sh
 ```
+
+Test

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Search } from 'lucide-react';
 import { productService } from '../api/product';
 import ProductCard from '../components/ProductCard';
@@ -14,15 +14,7 @@ const Products = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    fetchProducts();
-  }, [page, search, category]);
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
       const response = await productService.getProducts(page, 12, search, category);
@@ -33,16 +25,24 @@ const Products = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, search, category]);
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const response = await productService.getCategories();
       setCategories(response.data || []);
     } catch (error) {
       console.error('Failed to fetch categories');
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   const handleSearch = (e) => {
     e.preventDefault();

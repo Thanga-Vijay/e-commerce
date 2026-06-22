@@ -1,224 +1,456 @@
-# E-Commerce Platform - Production-Grade Microservices Architecture
+# 🛒 E-Commerce Platform - Cloud-Native Microservices
 
-A complete enterprise-level e-commerce platform built with microservices architecture, featuring full observability, event-driven communication, and cloud-native deployment.
+A production-ready, cloud-native e-commerce platform built with **Go microservices**, **React frontend**, deployed on **Kubernetes (k3d)** with **Floci** for cloud services emulation.
 
-## 🎯 Project Status
+[![CI/CD](https://github.com/yourusername/e-commerce/workflows/CI/badge.svg)](https://github.com/yourusername/e-commerce/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**🎉 ALL PHASES COMPLETE - Production-Ready E-Commerce Platform! 🎉**
+---
 
-### Completed Phases
-- ✅ **Phase 1**: Architecture Design & Database Schema
-- ✅ **Phase 2**: Auth & Product Services
-- ✅ **Phase 3**: Cart & Wishlist Services
-- ✅ **Phase 4**: Order & Payment Services (Stripe Integration)
-- ✅ **Phase 5**: Inventory & Notification Services
-- ✅ **Phase 6**: Reporting Service with Analytics
-- ✅ **Phase 7**: React Frontend (Complete UI)
-- ✅ **Phase 8**: Advanced Dockerization & Container Orchestration
-- ✅ **Phase 9**: Event-Driven Architecture with Kafka
-- ✅ **Phase 10**: Kubernetes Deployment & Orchestration
-- ✅ **Phase 11**: Monitoring & Observability (Prometheus, Grafana, Loki, Jaeger)
-- ✅ **Phase 12**: CI/CD Pipeline (GitHub Actions, Automated Deployment)
-- ✅ **Phase 13**: Security & Hardening (Network Policies, RBAC, Pod Security)
-- ✅ **Phase 14**: Disaster Recovery & Business Continuity (Automated Backups, DR Procedures)
+## 📋 Table of Contents
 
-## Technology Stack
+- [Features](#-features)
+- [Architecture](#-architecture)
+- [Tech Stack](#-tech-stack)
+- [**🍎 MacBook Setup**](#-macbook-setup-new) ⭐
+- [Prerequisites](#-prerequisites)
+- [Quick Start](#-quick-start)
+- [Project Structure](#-project-structure)
+- [Development](#-development)
+- [Testing](#-testing)
+- [Deployment](#-deployment)
+- [Monitoring](#-monitoring)
+- [API Documentation](#-api-documentation)
+- [Troubleshooting](#-troubleshooting)
+- [License](#-license)
+
+---
+
+## 🍎 MacBook Setup (NEW)
+
+**Running locally on your MacBook?** We've optimized the setup for you!
+
+### One-Line Setup
+```bash
+./setup-all.sh
+```
+
+### Manual Setup
+```bash
+# 1. Create k3d cluster (1 server + 2 agents)
+./k3d-setup.sh
+
+# 2. Deploy Floci (cloud services emulator)
+./floci-setup.sh
+
+# 3. Deploy everything
+kubectl apply -f k8s/databases/
+kubectl apply -f k8s/services/
+kubectl apply -f k8s/frontend/
+```
+
+### 📚 Complete Guides
+- **[MACBOOK_SETUP.md](MACBOOK_SETUP.md)** - Detailed setup guide with troubleshooting
+- **[K3D_CLUSTER_GUIDE.md](K3D_CLUSTER_GUIDE.md)** - Why 1 server + 2 agents? Resource allocation explained
+- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Essential commands cheat sheet
+- **[DOCKER_COMPOSE_CLEANUP.md](DOCKER_COMPOSE_CLEANUP.md)** - Docker Compose vs k3d guide
+
+### System Requirements
+- **RAM:** 16 GB minimum (32 GB recommended)
+- **CPU:** 4+ cores
+- **Storage:** 50 GB free
+- **macOS:** 12.0+ (Monterey or later)
+
+### k3d Configuration
+- **Cluster:** 1 server + 2 agents (optimal for MacBook)
+- **Registry:** Local registry at registry.localhost:5001
+- **Resources:** ~10 GB RAM, ~5-6 CPU cores
+- **Services:** 9 microservices + databases + Kafka + monitoring
+
+### Access After Setup
+- Frontend: http://ecommerce.local
+- Prometheus: http://localhost:9090
+- Grafana: http://localhost:3001
+- Floci: http://localhost:30456
+
+---
+
+## ✨ Features
+
+### Core Functionality
+- ✅ **User Authentication** - JWT-based auth with role-based access control (RBAC)
+- ✅ **Product Catalog** - Browse, search, filter products by category
+- ✅ **Shopping Cart** - Add, update, remove items with real-time sync
+- ✅ **Wishlist** - Save products for later
+- ✅ **Order Management** - Place orders, track status, view history
+- ✅ **Payment Processing** - Secure payment gateway integration
+- ✅ **Inventory Management** - Real-time stock tracking
+- ✅ **Notifications** - Email/SMS notifications via Kafka events
+- ✅ **Reporting & Analytics** - Sales reports, user analytics
+
+### Platform Features
+- 🚀 **Microservices Architecture** - 9 independent Go services
+- 🔄 **Event-Driven** - Kafka for asynchronous communication
+- 🐳 **Containerized** - Docker images for all services
+- ☸️ **Kubernetes Native** - Deployed on k3d (lightweight K8s)
+- ☁️ **AWS Services** - S3, ECR, Secrets Manager via LocalStack
+- 📊 **Observability** - Prometheus metrics, Grafana dashboards
+- 🔐 **Security** - mTLS, secrets management, security scanning
+- 🔄 **CI/CD** - GitHub Actions with automated testing
+- 🔧 **GitOps** - ArgoCD for declarative deployments
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         Frontend (React)                        │
+│                    http://ecommerce.local                       │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                    ┌────────▼────────┐
+                    │  NGINX Ingress  │
+                    └────────┬────────┘
+                             │
+        ┌────────────────────┼────────────────────┐
+        │                    │                    │
+┌───────▼───────┐   ┌───────▼───────┐   ┌───────▼───────┐
+│ Auth Service  │   │Product Service│   │ Cart Service  │
+│   :8081       │   │   :8082       │   │   :8083       │
+└───────┬───────┘   └───────┬───────┘   └───────┬───────┘
+        │                   │                    │
+        └───────────────────┼────────────────────┘
+                            │
+                ┌───────────┴───────────┐
+                │                       │
+        ┌───────▼───────┐       ┌──────▼──────┐
+        │  PostgreSQL   │       │    Kafka    │
+        │  (9 databases)│       │  (Events)   │
+        └───────────────┘       └─────────────┘
+                │
+        ┌───────▼───────┐
+        │  LocalStack   │
+        │  AWS Services │
+        │  S3, ECR, SM  │
+        └───────────────┘
+```
+
+### Microservices
+
+| Service | Port | Description | Database |
+|---------|------|-------------|----------|
+| **Auth** | 8081 | User authentication, JWT tokens | auth_db |
+| **Product** | 8082 | Product catalog, categories | product_db |
+| **Cart** | 8083 | Shopping cart management | cart_db |
+| **Wishlist** | 8084 | User wishlist | wishlist_db |
+| **Order** | 8085 | Order processing, history | order_db |
+| **Payment** | 8086 | Payment gateway integration | payment_db |
+| **Inventory** | 8087 | Stock management | inventory_db |
+| **Notification** | 8088 | Email/SMS notifications | notification_db |
+| **Reporting** | 8089 | Analytics, reports | reporting_db |
+| **Frontend** | 3000 | React SPA | - |
+
+---
+
+## 🛠️ Tech Stack
 
 ### Backend
-- **Language**: Go 1.21+
-- **Framework**: Gin Web Framework
-- **ORM**: GORM
-- **Database**: PostgreSQL 15 (9 separate databases)
-- **Cache**: Redis 7 with password authentication
-- **Message Queue**: Apache Kafka 7.5 with Zookeeper
-- **Event Streaming**: 26 event topics + Dead Letter Queue
+- **Language:** Go 1.22
+- **Framework:** Gin (HTTP routing)
+- **Database:** PostgreSQL 15 (9 separate databases)
+- **Cache:** Redis 7
+- **Message Queue:** Apache Kafka 3.6
+- **Authentication:** JWT (golang-jwt/jwt/v5)
 
 ### Frontend
-- **Framework**: React 18 with Vite
-- **Language**: JavaScript/JSX
-- **Styling**: Tailwind CSS 3.3
-- **Routing**: React Router v6
-- **HTTP Client**: Axios with interceptors
-- **State Management**: Context API
+- **Framework:** React 18
+- **Build Tool:** Vite 5
+- **Styling:** Tailwind CSS 3
+- **HTTP Client:** Axios
+- **Routing:** React Router 6
+- **State Management:** Context API
 
 ### Infrastructure
-- **Containerization**: Docker with multi-stage builds
-- **Orchestration**: Kubernetes + Docker Compose (dev/staging/prod)
-- **Event Streaming**: Apache Kafka 7.5 with Zookeeper
-- **Reverse Proxy**: Nginx Ingress Controller with TLS
-- **Monitoring**: Prometheus + Grafana + Alertmanager
-- **Logging**: Loki + Promtail for centralized logs
-- **Tracing**: Jaeger for distributed tracing
-- **Auto-Scaling**: HorizontalPodAutoscaler (2-20 replicas)
-- **Health Checks**: Comprehensive liveness & readiness probes
+- **Container Runtime:** Docker 24
+- **Orchestration:** Kubernetes (k3d v1.30.8)
+- **Ingress:** NGINX Ingress Controller
+- **AWS Emulation:** LocalStack 3.x
+- **CI/CD:** GitHub Actions
+- **GitOps:** ArgoCD (optional)
 
-## Architecture
+### Monitoring & Observability
+- **Metrics:** Prometheus
+- **Visualization:** Grafana
+- **Logging:** ELK Stack (optional)
+- **Tracing:** Jaeger (optional)
 
-This platform consists of 9 microservices + frontend:
+---
 
-1. **Auth Service** (Port 8081) - JWT authentication, user management, RBAC
-2. **Product Service** (Port 8082) - Product catalog, categories, Redis caching
-3. **Cart Service** (Port 8083) - Shopping cart with service-to-service calls
-4. **Wishlist Service** (Port 8084) - Wishlist management
-5. **Order Service** (Port 8085) - Order processing, state machine workflow
-6. **Payment Service** (Port 8086) - Stripe integration, webhooks, refunds
-7. **Inventory Service** (Port 8087) - Stock management, warehouses
-8. **Notification Service** (Port 8088) - Email notifications with SMTP
-9. **Reporting Service** (Port 8089) - Dashboard analytics, CSV/PDF reports
-10. **Frontend** (Port 3000) - React SPA with full e-commerce UI
+## 📦 Prerequisites
 
-## Quick Start
+Before you begin, ensure you have the following installed:
 
-### Development Environment
+### Required
+- **Docker Desktop** 24.0+ ([Install](https://docs.docker.com/get-docker/))
+- **kubectl** 1.28+ ([Install](https://kubernetes.io/docs/tasks/tools/))
+- **k3d** 5.0+ ([Install](https://k3d.io/))
+- **Git** 2.40+
 
-```bash
-# Start all services + Kafka
-make stack-up
+### Optional (for development)
+- **Go** 1.22+ ([Install](https://go.dev/dl/))
+- **Node.js** 18+ ([Install](https://nodejs.org/))
+- **AWS CLI** 2.0+ ([Install](https://aws.amazon.com/cli/))
+- **Make** (for Makefile commands)
 
-# Or start services only
-make dev-up-build
+### System Requirements
+- **OS:** Linux, macOS, or Windows with WSL2
+- **RAM:** 8GB minimum, 16GB recommended
+- **CPU:** 4 cores minimum
+- **Disk:** 20GB free space
 
-# Check health
-./scripts/health-check.sh
+---
 
-# View logs
-make dev-logs
-```
+## 🚀 Quick Start
 
-### With Kafka Event Streaming
+### 1. Clone the Repository
 
 ```bash
-# Start Kafka infrastructure
-make kafka-up
-
-# View Kafka UI
-open http://localhost:8090
-
-# List topics
-make kafka-topics
-
-# Consume events
-make kafka-consume TOPIC=order.created
+git clone https://github.com/yourusername/e-commerce.git
+cd e-commerce
 ```
 
-### Production Deployment
+### 2. Set Up k3d Cluster
 
 ```bash
-# Setup environment
-cp .env.prod.example .env.prod
-# Edit .env.prod with your production values
+# Make scripts executable
+chmod +x k3d-setup.sh localstack-setup.sh scripts/*.sh
 
-# Deploy production
-make prod-up-build
-
-# Run health check
-./scripts/health-check.sh
+# Create k3d cluster (takes ~3 minutes)
+./k3d-setup.sh
 ```
 
-See [PHASE8_SETUP.md](PHASE8_SETUP.md) for detailed Docker and deployment instructions.
-See [PHASE9_KAFKA.md](PHASE9_KAFKA.md) for Kafka event streaming documentation.
+**What this does:**
+- Creates a k3d cluster with 1 server + 2 agents
+- Installs NGINX Ingress Controller
+- Creates namespaces: `ecommerce`, `monitoring`, `localstack`
+- Sets up local registry at `registry.localhost:5001`
+- Configures `/etc/hosts` entries
 
-## Documentation
+### 3. Deploy LocalStack (AWS Emulation)
 
-### Phase Documentation
-- [Phase 1: Architecture](PHASE1_ARCHITECTURE.md) - System design, database schemas, API contracts
-- [Phase 8: Docker & Orchestration](PHASE8_SETUP.md) - Container setup, deployment, monitoring
-- [Phase 9: Kafka Event Streaming](PHASE9_KAFKA.md) - Event-driven architecture, topics, consumers
+```bash
+# Deploy LocalStack to k3d
+./localstack-setup.sh
 
-### Service Ports
-- Frontend: http://localhost:3000
-- Auth Service: http://localhost:8081
-- Product Service: http://localhost:8082
-- Cart Service: http://localhost:8083
-- Wishlist Service: http://localhost:8084
-- Order Service: http://localhost:8085
-- Payment Service: http://localhost:8086
-- Inventory Service: http://localhost:8087
-- Notification Service: http://localhost:8088
-- Reporting Service: http://localhost:8089
+# Initialize AWS resources (S3, ECR, Secrets)
+./scripts/init-localstack.sh
+```
 
-### Infrastructure Ports
-- Kafka: localhost:9093 (external), kafka:9092 (internal)
-- Zookeeper: localhost:2181
-- Kafka UI: http://localhost:8090
-- Prometheus: http://localhost:9090 (when monitoring stack running)
-- Grafana: http://localhost:3001 (when monitoring stack running)
-- Alertmanager: http://localhost:9093 (when monitoring stack running)
+**LocalStack provides:**
+- S3 buckets for images, backups, logs
+- ECR repositories for container images
+- Secrets Manager for credentials
+- CloudWatch for logging
 
-## Project Structure
-See [PHASE9_KAFKA.md](PHASE9_KAFKA.md) for Kafka event streaming documentation.
-     # React frontend application
-## Project Structure
+### 4. Build and Push Images
+
+```bash
+# Build all service images
+make build-all
+
+# Tag and push to local registry
+make push-all
+```
+
+### 5. Deploy to Kubernetes
+
+```bash
+# Deploy infrastructure (PostgreSQL, Redis, Kafka)
+kubectl apply -f k8s/postgres/
+kubectl apply -f k8s/redis/
+kubectl apply -f k8s/kafka/
+
+# Wait for infrastructure to be ready
+kubectl wait --for=condition=Ready pod -l app=postgres -n ecommerce --timeout=300s
+kubectl wait --for=condition=Ready pod -l app=kafka -n ecommerce --timeout=300s
+
+# Deploy ConfigMap and Secrets
+kubectl apply -f k8s/configmap.yaml
+kubectl apply -f k8s/secrets.yaml
+
+# Deploy all microservices
+kubectl apply -f k8s/deployments/
+
+# Deploy Ingress
+kubectl apply -f k8s/ingress/
+```
+
+### 6. Verify Deployment
+
+```bash
+# Check all pods are running
+kubectl get pods -n ecommerce
+
+# Check services
+kubectl get svc -n ecommerce
+
+# Check ingress
+kubectl get ingress -n ecommerce
+```
+
+### 7. Access the Application
+
+Open your browser and navigate to:
+
+- **Frontend:** http://ecommerce.local
+- **API:** http://api.ecommerce.local/health
+- **LocalStack:** http://localhost:30456/_localstack/health
+
+---
+
+## 📁 Project Structure
 
 ```
 e-commerce/
-├── frontend/                      # React frontend application
-├── auth-service/                  # Authentication service
-├── product-service/               # Product catalog service
-├── cart-service/                  # Shopping cart service
-├── wishlist-service/              # Wishlist service
-├── order-service/                 # Order management service
-├── payment-service/               # Payment processing service
-├── inventory-service/             # Inventory management service
-├── notification-service/          # Notification service
-├── reporting-service/             # Analytics and reporting service
-├── events/                        # Event definitions and Kafka utilities
-│   ├── contracts.go              # Event type definitions
-│   ├── kafka/                    # Kafka producer/consumer
-│   │   ├── producer.go           # Event producer
-│   │   ├── consumer.go           # Event consumer
-│   │   └── config.go             # Kafka configuration
-│   └── go.mod                    # Event module dependencies
-├── examples/                      # Integration examples
-│   ├── kafka-integration.go      # Service Kafka integration
-│   ├── kafka-consumers.go        # Consumer examples
-│   └── dlq-handler.go            # Dead letter queue handler
-├── nginx/                         # Nginx reverse proxy
-├── monitoring/                    # Monitoring stack configs
-│   ├── prometheus.yml            # Prometheus configuration
-│   ├── alerts.yml                # Alert rules
-│   ├── alertmanager.yml          # Alertmanager configuration
-│   └── grafana/                  # Grafana datasources & dashboards
-├── scripts/                       # Utility scripts
-│   ├── health-check.sh           # Health check script
-│   ├── backup.sh                 # Database backup script
-│   ├── restore.sh                # Database restore script
-│   └── setup-secrets.sh          # Docker secrets setup
-├── docker-compose.yml             # Development orchestration
-├── docker-compose.prod.yml        # Production orchestration
-├── docker-compose.override.yml    # Development overrides
-├── docker-compose.kafka.yml       # Kafka infrastructure
-├── docker-compose.monitoring.yml  # Monitoring stack
-├── docker-compose.secrets.yml     # Secrets configuration
-├── Makefile                       # Docker & Kafka management
-├── .env.prod.example              # Production env template
-├── .env.staging.example           # Staging env template
-├── .dockerignore                  # Docker ignore rules
-├── PHASE1_ARCHITECTURE.md         # Architecture documentation
-├── PHASE8_SETUP.md                # Docker setup documentation
-├── PHASE9_KAFKA.md                # Kafka event streaming docs
-└── README.md                      # This file
+├── .github/workflows/       # CI/CD pipelines
+├── k8s/                     # Kubernetes manifests
+│   ├── localstack/          # LocalStack deployment
+│   ├── deployments/         # Service deployments
+│   ├── postgres/            # PostgreSQL StatefulSet
+│   ├── redis/               # Redis deployment
+│   ├── kafka/               # Kafka cluster
+│   └── ingress/             # Ingress rules
+├── auth-service/            # Authentication microservice
+├── product-service/         # Product catalog microservice
+├── cart-service/            # Shopping cart microservice
+├── wishlist-service/        # Wishlist microservice
+├── order-service/           # Order management microservice
+├── payment-service/         # Payment processing microservice
+├── inventory-service/       # Inventory management microservice
+├── notification-service/    # Notification microservice
+├── reporting-service/       # Analytics microservice
+├── frontend/                # React frontend
+├── scripts/                 # Utility scripts
+├── k3d-config.yaml          # k3d cluster configuration
+├── k3d-setup.sh             # k3d cluster setup script
+├── localstack-setup.sh      # LocalStack setup script
+├── Makefile                 # Make commands
+└── README.md                # This file
 ```
 
-## Features
+---
 
-### Phase 9 Highlights
-- ✅ **Apache Kafka Integration**: Complete event streaming infrastructure
-- ✅ **26 Event Topics**: Comprehensive event coverage across all services
-- ✅ **Dead Letter Queue**: Automatic retry with failure handling
-- ✅ **Kafka UI**: Web-based topic and consumer management
-- ✅ **Producer/Consumer Utilities**: Reusable Go libraries
-- ✅ **Event Contracts**: Typed event definitions
-- ✅ **Integration Examples**: Auth, Order, Inventory, Notification
-- ✅ **Async Communication**: Decoupled service communication
-- ✅ **Event Sourcing Ready**: Foundation for event sourcing patterns
+## 💻 Development
 
-### Phase 8 Highlights
-- ✅ **Multi-Environment Support**: Dev, staging, and production configurations
-- ✅ **Production Docker Compose**: Resource limits, health checks, networking
-- ✅ **Nginx Reverse Proxy**: Rate limiting, security headers, gzip compression
-- ✅ **Monitoring Stack**: Prometheus, Grafana, Alertmanager
-- ✅ **Automated Backup/Restore**: Database backup and restore scripts
+### Local Development (without Kubernetes)
+
+```bash
+# Start infrastructure with Docker Compose
+docker-compose up -d postgres redis kafka
+
+# Run a service locally (example: auth-service)
+cd auth-service
+go mod download
+go run main.go
+
+# Run frontend locally
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+## 🧪 Testing
+
+### Run Unit Tests
+
+```bash
+# Test all Go services
+make test
+
+# Test specific service
+cd auth-service
+go test -v ./...
+go test -race ./...
+```
+
+---
+
+## 🚢 Deployment
+
+### Automated Deployment (GitHub Actions)
+
+The CI/CD pipeline automatically:
+
+1. **On PR:** Runs tests, linting, security scans
+2. **On merge to `develop`:** Builds and tests all services
+3. **On merge to `main`:** Builds, pushes to registry, deploys to cluster
+
+---
+
+## 📊 Monitoring
+
+### Prometheus Metrics
+
+Each service exposes metrics at `/metrics`:
+
+```bash
+curl http://api.ecommerce.local/auth/metrics
+```
+
+---
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+#### 1. Pods not starting
+
+```bash
+# Check pod status
+kubectl get pods -n ecommerce
+
+# Describe pod to see events
+kubectl describe pod <pod-name> -n ecommerce
+
+# Check logs
+kubectl logs <pod-name> -n ecommerce
+```
+
+#### 2. Cannot access application
+
+```bash
+# Check ingress
+kubectl get ingress -n ecommerce
+
+# Verify /etc/hosts
+cat /etc/hosts | grep ecommerce
+```
+
+### Cleanup
+
+```bash
+# Delete all resources
+kubectl delete namespace ecommerce monitoring localstack
+
+# Delete k3d cluster
+k3d cluster delete ecommerce-cluster
+
+# Clean Docker resources
+docker system prune -a --volumes
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+**Made with ❤️ by the E-Commerce Team**
 - ✅ **Health Monitoring**: Comprehensive health check system
 - ✅ **Docker Secrets**: Secure secrets management
 - ✅ **Makefile Commands**: 70+ commands for Docker & Kafka operations

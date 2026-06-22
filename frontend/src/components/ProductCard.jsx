@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ShoppingCart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import toast from 'react-hot-toast';
 
 const ProductCard = ({ product }) => {
   const { addItem } = useCart();

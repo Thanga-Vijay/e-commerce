@@ -1,0 +1,133 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: localstack
+  labels:
+    name: localstack
+    env: local
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: localstack-config
+  namespace: localstack
+data:
+  SERVICES: "s3,ecr,secretsmanager,ssm,cloudwatch,logs,iam,sts"
+  DEBUG: "1"
+  PERSISTENCE: "1"
+  DOCKER_HOST: "unix:///var/run/docker.sock"
+  DATA_DIR: "/tmp/localstack/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: localstack-data
+  namespace: localstack
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: localstack
+  namespace: localstack
+  labels:
+    app: localstack
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: localstack
+  template:
+    metadata:
+      labels:
+        app: localstack
+    spec:
+      containers:
+      - name: localstack
+        image: localstack/localstack:latest
+        ports:
+        - containerPort: 4566
+          name: edge
+          protocol: TCP
+        envFrom:
+        - configMapRef:
+            name: localstack-config
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          value: "test"
+        - name: AWS_SECRET_ACCESS_KEY
+          value: "test"
+        - name: AWS_DEFAULT_REGION
+          value: "us-east-1"
+        volumeMounts:
+        - name: localstack-data
+          mountPath: /tmp/localstack
+        - name: docker-sock
+          mountPath: /var/run/docker.sock
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 2000m
+            memory: 2Gi
+        livenessProbe:
+          httpGet:
+            path: /_localstack/health
+            port: 4566
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /_localstack/health
+            port: 4566
+          initialDelaySeconds: 10
+          periodSeconds: 5
+      volumes:
+      - name: localstack-data
+        persistentVolumeClaim:
+          claimName: localstack-data
+      - name: docker-sock
+        hostPath:
+          path: /var/run/docker.sock
+          type: Socket
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: localstack
+  namespace: localstack
+  labels:
+    app: localstack
+spec:
+  type: ClusterIP
+  ports:
+  - port: 4566
+    targetPort: 4566
+    protocol: TCP
+    name: edge
+  selector:
+    app: localstack
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: localstack-external
+  namespace: localstack
+  labels:
+    app: localstack
+spec:
+  type: NodePort
+  ports:
+  - port: 4566
+    targetPort: 4566
+    nodePort: 30456
+    protocol: TCP
+    name: edge
+  selector:
+    app: localstack

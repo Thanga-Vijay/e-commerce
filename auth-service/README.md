@@ -93,3 +93,8 @@ auth-service/
 - `SMTP_PORT` - Email server port
 - `SMTP_USER` - Email username
 - `SMTP_PASSWORD` - Email password
+
+Test
+Test2
+Test3
+Test4

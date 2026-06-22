@@ -1,0 +1,102 @@
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: ecommerce-cluster
+
+# Cluster sizing optimized for MacBook
+# 1 server + 2 agents provides good balance for 9 microservices
+servers: 1
+agents: 2
+image: rancher/k3s:v1.30.8-k3s1
+
+# Port mappings for services
+ports:
+  # HTTP/HTTPS for Ingress
+  - port: 80:80
+    nodeFilters:
+      - loadbalancer
+  - port: 443:443
+    nodeFilters:
+      - loadbalancer
+  
+  # PostgreSQL (for external access if needed)
+  - port: 5432:5432
+    nodeFilters:
+      - server:0
+  
+  # Kafka
+  - port: 9092:9092
+    nodeFilters:
+      - server:0
+  
+  # Redis
+  - port: 6379:6379
+    nodeFilters:
+      - server:0
+  
+  # Prometheus
+  - port: 9090:9090
+    nodeFilters:
+      - server:0
+  
+  # Grafana
+  - port: 3001:3000
+    nodeFilters:
+      - server:0
+
+# Volume mappings for data persistence
+volumes:
+  - volume: ./data:/data
+    nodeFilters:
+      - all
+  - volume: ./k8s:/k8s
+    nodeFilters:
+      - server:0
+
+# Local container registry for faster image loading
+registries:
+  create:
+    name: registry.localhost
+    host: "0.0.0.0"
+    hostPort: "5001"
+  config: |
+    mirrors:
+      "registry.localhost:5001":
+        endpoint:
+          - http://registry.localhost:5001
+
+# Cluster options
+options:
+  k3d:
+    wait: true
+    timeout: "300s"
+    disableLoadbalancer: false
+  
+  k3s:
+    extraArgs:
+      # Disable Traefik (we use NGINX Ingress)
+      - arg: --disable=traefik
+        nodeFilters:
+          - server:*
+      # Disable metrics-server (we use Prometheus)
+      - arg: --disable=metrics-server
+        nodeFilters:
+          - server:*
+      # Optimize for local development
+      - arg: --kube-apiserver-arg=--max-requests-inflight=400
+        nodeFilters:
+          - server:*
+  
+  kubeconfig:
+    updateDefaultKubeconfig: true
+    switchCurrentContext: true
+
+# Runtime configuration for better MacBook performance
+runtime:
+  gpuRequest: all
+  labels:
+    - label: env=local
+      nodeFilters:
+        - all
+    updateDefaultKubeconfig: true
+    switchCurrentContext: true

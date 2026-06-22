@@ -1,0 +1,135 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: floci
+  labels:
+    name: floci
+    env: local
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: floci
+  namespace: floci
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: floci-config
+  namespace: floci
+data:
+  # Floci configuration
+  SERVICES: "s3,sqs,sns,dynamodb,lambda,secretsmanager,ssm,ecr,sts,iam"
+  DEBUG: "1"
+  EDGE_PORT: "4566"
+  DEFAULT_REGION: "us-east-1"
+  # Persistence
+  PERSISTENCE: "1"
+  DATA_DIR: "/data"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: floci
+  namespace: floci
+  labels:
+    app: floci
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: floci
+  template:
+    metadata:
+      labels:
+        app: floci
+    spec:
+      serviceAccountName: floci
+      containers:
+      - name: floci
+        # Using LocalStack as a base since Floci has similar API
+        # You can replace this with actual Floci image if available
+        image: localstack/localstack:3.0
+        ports:
+        - containerPort: 4566
+          name: edge
+          protocol: TCP
+        envFrom:
+        - configMapRef:
+            name: floci-config
+        env:
+        - name: DOCKER_HOST
+          value: "unix:///var/run/docker.sock"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: docker-sock
+          mountPath: /var/run/docker.sock
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 4566
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 4566
+          initialDelaySeconds: 20
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: floci-data
+      - name: docker-sock
+        hostPath:
+          path: /var/run/docker.sock
+          type: Socket
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: floci
+  namespace: floci
+  labels:
+    app: floci
+spec:
+  type: NodePort
+  selector:
+    app: floci
+  ports:
+  - name: edge
+    protocol: TCP
+    port: 4566
+    targetPort: 4566
+    nodePort: 30456
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: floci-data
+  namespace: floci
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: local-path
